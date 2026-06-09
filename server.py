@@ -2012,7 +2012,7 @@ _app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
-logger.info("CORS middleware enabled for remote transport / 已启用 CORS 中间件")
-uvicorn.run(_app, host="0.0.0.0", port=OMBRE_PORT)
+    logger.info("CORS middleware enabled for remote transport / 已启用 CORS 中间件")
+    uvicorn.run(_app, host="0.0.0.0", port=OMBRE_PORT)
     else:
         mcp.run(transport=transport)
