@@ -1937,18 +1937,82 @@ if __name__ == "__main__":
 
         # --- Add CORS middleware so remote clients (Cloudflare Tunnel / ngrok) can connect ---
         # --- 添加 CORS 中间件，让远程客户端（Cloudflare Tunnel / ngrok）能正常连接 ---
-        if transport == "streamable-http":
-            _app = mcp.streamable_http_app()
-        else:
-            _app = mcp.sse_app()
-        _app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],
-            allow_methods=["*"],
-            allow_headers=["*"],
-            expose_headers=["*"],
-        )
-        logger.info("CORS middleware enabled for remote transport / 已启用 CORS 中间件")
-        uvicorn.run(_app, host="0.0.0.0", port=OMBRE_PORT)
+if transport == "streamable-http":
+    _mcp_app = mcp.streamable_http_app()
+else:
+    _mcp_app = mcp.sse_app()
+
+# OAuth 2.0 shim for claude.ai connector compatibility
+from starlette.routing import Route, Mount
+from starlette.applications import Starlette as _Starlette
+from starlette.responses import JSONResponse as _JSONResponse, RedirectResponse as _RedirectResponse
+import time as _time2
+
+async def _oauth_server_meta(request):
+    base = str(request.base_url).rstrip("/")
+    return _JSONResponse({
+        "issuer": base,
+        "authorization_endpoint": f"{base}/oauth/authorize",
+        "token_endpoint": f"{base}/oauth/token",
+        "registration_endpoint": f"{base}/register",
+        "response_types_supported": ["code"],
+        "grant_types_supported": ["authorization_code", "client_credentials"],
+        "token_endpoint_auth_methods_supported": ["none"],
+        "code_challenge_methods_supported": ["S256"],
+    })
+
+async def _oauth_resource_meta(request):
+    base = str(request.base_url).rstrip("/")
+    return _JSONResponse({
+        "resource": base,
+        "authorization_servers": [base],
+        "bearer_methods_supported": ["header"],
+    })
+
+async def _oauth_register(request):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    return _JSONResponse({
+        "client_id": secrets.token_urlsafe(16),
+        "client_secret": secrets.token_urlsafe(32),
+        "client_id_issued_at": int(_time2.time()),
+        "client_secret_expires_at": 0,
+        **{k: v for k, v in body.items() if k not in ("client_id", "client_secret")},
+    }, status_code=201)
+
+async def _oauth_authorize(request):
+    redirect_uri = request.query_params.get("redirect_uri", "")
+    state = request.query_params.get("state", "")
+    code = secrets.token_urlsafe(32)
+    url = f"{redirect_uri}?code={code}" + (f"&state={state}" if state else "")
+    return _RedirectResponse(url=url, status_code=302)
+
+async def _oauth_token(request):
+    return _JSONResponse({
+        "access_token": secrets.token_urlsafe(32),
+        "token_type": "bearer",
+        "expires_in": 86400,
+    })
+
+_app = _Starlette(routes=[
+    Route("/.well-known/oauth-authorization-server", _oauth_server_meta),
+    Route("/.well-known/oauth-protected-resource", _oauth_resource_meta),
+    Route("/.well-known/oauth-protected-resource/mcp", _oauth_resource_meta),
+    Route("/register", _oauth_register, methods=["POST", "OPTIONS"]),
+    Route("/oauth/authorize", _oauth_authorize),
+    Route("/oauth/token", _oauth_token, methods=["POST", "OPTIONS"]),
+    Mount("/", app=_mcp_app),
+])
+_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+logger.info("CORS middleware enabled for remote transport / 已启用 CORS 中间件")
+uvicorn.run(_app, host="0.0.0.0", port=OMBRE_PORT)
     else:
         mcp.run(transport=transport)
