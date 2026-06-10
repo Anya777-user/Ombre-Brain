@@ -1995,6 +1995,13 @@ if __name__ == "__main__":
                 "expires_in": 86400,
             })
 
+        from contextlib import asynccontextmanager
+
+        @asynccontextmanager
+        async def _lifespan(app):
+            async with _mcp_app.router.lifespan_context(app):
+                yield
+
         _app = _Starlette(routes=[
             Route("/.well-known/oauth-authorization-server", _oauth_server_meta),
             Route("/.well-known/oauth-protected-resource", _oauth_resource_meta),
@@ -2003,7 +2010,7 @@ if __name__ == "__main__":
             Route("/oauth/authorize", _oauth_authorize),
             Route("/oauth/token", _oauth_token, methods=["POST", "OPTIONS"]),
             Mount("/", app=_mcp_app),
-        ])
+        ], lifespan=_lifespan)
         _app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
