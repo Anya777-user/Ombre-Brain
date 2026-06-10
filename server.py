@@ -1948,7 +1948,7 @@ if __name__ == "__main__":
         import time as _time2
 
         async def _oauth_server_meta(request):
-            base = str(request.base_url).rstrip("/")
+            base = str(request.base_url).rstrip("/").replace("http://", "https://")
             return _JSONResponse({
                 "issuer": base,
                 "authorization_endpoint": f"{base}/oauth/authorize",
@@ -1961,7 +1961,7 @@ if __name__ == "__main__":
             })
 
         async def _oauth_resource_meta(request):
-            base = str(request.base_url).rstrip("/")
+            base = str(request.base_url).rstrip("/").replace("http://", "https://")
             return _JSONResponse({
                 "resource": base,
                 "authorization_servers": [base],
