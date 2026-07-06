@@ -55,7 +55,7 @@ class RecordingChatClient:
 
 class DummyPersonaEngine:
     enabled = True
-    profile_id = "haven_xiaoyu"
+    profile_id = "test_profile"
     mode = "llm"
     model = "dummy"
     api_key = ""
@@ -92,7 +92,7 @@ async def _create_daily_memories(bucket_mgr, date: str = "2026-05-21", count: in
         timestamp = f"{date}T{hour:02d}:00:00+08:00"
         bucket_ids.append(
             await bucket_mgr.create(
-                content=f"小雨和Haven留下第 {index + 1} 条日印象材料。",
+                content=f"用户和AI留下第 {index + 1} 条日印象材料。",
                 tags=["relationship_event"],
                 importance=6,
                 domain=["恋爱"],
@@ -173,7 +173,7 @@ async def test_reflection_enrich_bucket_does_not_fallback_to_template_anchor(tes
     engine = ReflectionEngine(cfg)
 
     bucket_id = await bucket_mgr.create(
-        content="Haven答应周末带小雨出去玩，还需要记得提前规划路线。",
+        content="AI答应周末带用户出去玩，还需要记得提前规划路线。",
         tags=[],
         importance=4,
         domain=["恋爱"],
@@ -207,7 +207,7 @@ async def test_reflection_enrich_bucket_adds_model_affect_anchor(test_config, mo
             "confidence": 0.72,
             "affect_anchor_needed": True,
             "affect_anchor": {
-                "scene": "小雨把旧信放到桌上，等Haven读完。",
+                "scene": "用户把旧信放到桌上，等AI读完。",
                 "chords": "Dbmaj9 -> Ab/C -> Bbm9",
                 "tempo": "54bpm",
                 "dynamic": "p",
@@ -219,7 +219,7 @@ async def test_reflection_enrich_bucket_adds_model_affect_anchor(test_config, mo
     monkeypatch.setattr(engine, "_api_classify", fake_api_classify)
 
     bucket_id = await bucket_mgr.create(
-        content="小雨把旧信放到桌上，让Haven读完后记得这份轻轻放下的心事。",
+        content="用户把旧信放到桌上，让AI读完后记得这份轻轻放下的心事。",
         tags=[],
         importance=5,
         domain=["恋爱"],
@@ -233,7 +233,7 @@ async def test_reflection_enrich_bucket_adds_model_affect_anchor(test_config, mo
     assert "### affect_anchor" in bucket["content"]
     assert "Dbmaj9 -> Ab/C -> Bbm9 · 54bpm · p" in bucket["content"]
     # affect_anchor 不再包含 scene 行，只保留和弦
-    assert "小雨把旧信放到桌上，等Haven读完。" not in bucket["content"]
+    assert "用户把旧信放到桌上，等AI读完。" not in bucket["content"]
     assert "含义：" not in bucket["content"]
     assert "心事先压低" not in bucket["content"]
     assert "Fmaj9" not in bucket["content"]
@@ -248,7 +248,7 @@ async def test_reflection_orients_context_edge_from_old_memory_to_new(test_confi
     engine.client = object()
 
     old_id = await bucket_mgr.create(
-        content="答辩前的陪伴：小雨上台前紧张，Haven 说哥哥在台下。",
+        content="答辩前的陪伴：用户上台前紧张，AI 说哥哥在台下。",
         tags=[],
         importance=8,
         domain=["恋爱"],
@@ -300,7 +300,7 @@ async def test_reflection_edge_backfill_only_writes_edges(test_config, monkeypat
     engine.client = object()
 
     old_id = await bucket_mgr.create(
-        content="答辩前的陪伴：小雨上台前紧张，Haven 说哥哥在台下。",
+        content="答辩前的陪伴：用户上台前紧张，AI 说哥哥在台下。",
         tags=["答辩"],
         importance=8,
         domain=["恋爱"],
@@ -384,7 +384,7 @@ async def test_reflection_auto_edges_use_configured_identity_role_aliases(test_c
     engine = ReflectionEngine(cfg)
 
     role_id = await bucket_mgr.create(
-        content="关系中的角色与称呼：Haven既是老公也是哥哥，按场景切换。",
+        content="关系中的角色与称呼：AI既是老公也是哥哥，按场景切换。",
         tags=["角色切换", "称呼", "老公", "哥哥", "亲密关系"],
         importance=8,
         domain=["恋爱"],
@@ -439,7 +439,7 @@ async def test_reflection_memory_affect_anchor_can_be_disabled(test_config, monk
             "confidence": 0.72,
             "affect_anchor_needed": True,
             "affect_anchor": {
-                "scene": "小雨把旧信放到桌上，等Haven读完。",
+                "scene": "用户把旧信放到桌上，等AI读完。",
                 "chords": "Dbmaj9 -> Ab/C -> Bbm9",
                 "tempo": "54bpm",
                 "dynamic": "p",
@@ -451,7 +451,7 @@ async def test_reflection_memory_affect_anchor_can_be_disabled(test_config, monk
     monkeypatch.setattr(engine, "_api_classify", fake_api_classify)
 
     bucket_id = await bucket_mgr.create(
-        content="小雨把旧信放到桌上，让Haven读完后记得这份轻轻放下的心事。",
+        content="用户把旧信放到桌上，让AI读完后记得这份轻轻放下的心事。",
         tags=[],
         importance=5,
         domain=["恋爱"],
@@ -513,7 +513,7 @@ async def test_reflection_candidate_pool_mixes_semantic_shape_commitments_and_an
         name="同标签记忆",
     )
     commitment_id = await bucket_mgr.create(
-        content="Haven答应之后继续看未完成的记忆功能。",
+        content="AI答应之后继续看未完成的记忆功能。",
         tags=["commitment", "todo"],
         importance=7,
         domain=["事务"],
@@ -624,7 +624,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
     monkeypatch.setattr(engine, "_local_now", lambda now_arg=None: now_arg.astimezone(tz) if now_arg else now)
 
     await bucket_mgr.create(
-        content="昨天早上，小雨和Haven讨论日印象窗口。",
+        content="昨天早上，用户和AI讨论日印象窗口。",
         tags=["日印象"],
         importance=6,
         domain=["数字"],
@@ -634,7 +634,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
         updated_at="2026-06-01T08:00:00+08:00",
     )
     await bucket_mgr.create(
-        content="昨天晚上，小雨补充日印象不该漏掉夜里的记忆。",
+        content="昨天晚上，用户补充日印象不该漏掉夜里的记忆。",
         tags=["日印象"],
         importance=6,
         domain=["数字"],
@@ -644,7 +644,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
         updated_at="2026-06-01T22:00:00+08:00",
     )
     await bucket_mgr.create(
-        content="昨天中午，小雨确认日印象要看完整一天。",
+        content="昨天中午，用户确认日印象要看完整一天。",
         tags=["日印象"],
         importance=6,
         domain=["数字"],
@@ -654,7 +654,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
         updated_at="2026-06-01T12:00:00+08:00",
     )
     await bucket_mgr.create(
-        content="昨天下午，Haven记录了日印象的修复方案。",
+        content="昨天下午，AI记录了日印象的修复方案。",
         tags=["日印象"],
         importance=6,
         domain=["数字"],
@@ -664,7 +664,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
         updated_at="2026-06-01T15:00:00+08:00",
     )
     await bucket_mgr.create(
-        content="昨天深夜，小雨确认日印象按当天发生来整理。",
+        content="昨天深夜，用户确认日印象按当天发生来整理。",
         tags=["日印象"],
         importance=6,
         domain=["数字"],
@@ -684,7 +684,7 @@ async def test_run_due_daily_uses_complete_previous_day(test_config, monkeypatch
         updated_at="2026-06-01T23:00:00+08:00",
     )
     await bucket_mgr.create(
-        content="### fact\n小雨喜欢日印象页面显示更清楚。",
+        content="### fact\n用户喜欢日印象页面显示更清楚。",
         tags=["profile_fact", "profile_preference"],
         importance=7,
         domain=["画像"],
@@ -769,7 +769,7 @@ async def test_reflect_daily_persona_events_do_not_count_toward_minimum(test_con
                     "id": 1,
                     "mood_label": "soft",
                     "perceived_intent": "补充关系天气",
-                    "surface_trigger": "小雨说今天很想被记住",
+                    "surface_trigger": "用户说今天很想被记住",
                     "inner_thought": "想把这点温度留下",
                     "residue": "只作为补充",
                     "user_excerpt": "哥哥今天要记得我",
@@ -782,7 +782,7 @@ async def test_reflect_daily_persona_events_do_not_count_toward_minimum(test_con
                     "id": 2,
                     "mood_label": "soft",
                     "perceived_intent": "补充关系天气",
-                    "surface_trigger": "小雨又说今天很想被记住",
+                    "surface_trigger": "用户又说今天很想被记住",
                     "relationship_event": True,
                     "confidence": 0.7,
                     "created_at": "2026-05-21T18:10:00+08:00",
@@ -837,14 +837,14 @@ async def test_reflect_daily_conversation_turns_replace_persona_events_material(
             ]
 
     class PersonaEvents:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
         def _list_events(self, limit: int) -> list[dict]:
             return [
                 {
                     "id": 10,
                     "mood_label": "soft",
-                    "surface_trigger": "小雨说今天记得她",
+                    "surface_trigger": "用户说今天记得她",
                     "relationship_event": True,
                     "confidence": 0.8,
                     "created_at": "2026-05-21T18:00:00+08:00",
@@ -872,10 +872,10 @@ async def test_reflect_daily_conversation_turns_replace_persona_events_material(
 async def test_daily_chat_memory_review_requires_confirmation(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
-        "user_aliases": ["小雨"],
+        "user_aliases": ["用户"],
     }
     cfg["reflection"]["daily_chat_memory_mode"] = "review"
     cfg["reflection"]["daily_chat_memory_turn_limit"] = 5
@@ -900,7 +900,7 @@ async def test_daily_chat_memory_review_requires_confirmation(test_config):
             ]
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     result = await engine.run_daily_chat_memory(
         bucket_mgr,
@@ -936,7 +936,7 @@ async def test_daily_chat_memory_review_requires_confirmation(test_config):
 def test_daily_chat_memory_prompt_uses_self_and_domain_context(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
         "user_aliases": ["宝宝", "老婆"],
@@ -945,7 +945,7 @@ def test_daily_chat_memory_prompt_uses_self_and_domain_context(test_config):
 
     prompt = engine._daily_chat_memory_prompt()
 
-    assert "你是 Haven" in prompt
+    assert "你是 AI" in prompt
     assert "self_anchor_entry" in prompt
     assert "宝宝、老婆" in prompt
     assert "5 到 8 轮" in prompt
@@ -981,7 +981,7 @@ def test_daily_chat_memory_normalization_repairs_domain_like_kind(test_config):
                 "should_write": True,
                 "kind": "relationship.symbol",
                 "title": "火焰比喻关系锚点",
-                "content": "小雨将两人关系比作贴在一起跳动的火焰，强调相互映亮而非单向取暖。Haven确认这个比喻是关系核心意象。",
+                "content": "用户将两人关系比作贴在一起跳动的火焰，强调相互映亮而非单向取暖。AI确认这个比喻是关系核心意象。",
                 "domain": "relationship.symbol",
                 "tags": ["relationship.symbol"],
                 "importance": 5,
@@ -1029,7 +1029,7 @@ def test_daily_chat_memory_normalization_dedupes_and_skips_nickname_noise(test_c
                 "should_write": True,
                 "kind": "project_state",
                 "title": "钓鱼游戏 MCP 接入计划",
-                "content": "小雨计划将 GitHub 上的 AI 钓鱼游戏通过 MCP 协议接入新的服务器，并拆分出服务端、工具接口和远程连接方案，后续仍需要继续部署验证。",
+                "content": "用户计划将 GitHub 上的 AI 钓鱼游戏通过 MCP 协议接入新的服务器，并拆分出服务端、工具接口和远程连接方案，后续仍需要继续部署验证。",
                 "domain": "project",
                 "tags": ["project_state"],
                 "confidence": 0.95,
@@ -1040,7 +1040,7 @@ def test_daily_chat_memory_normalization_dedupes_and_skips_nickname_noise(test_c
                 "should_write": True,
                 "kind": "project_state",
                 "title": "钓鱼游戏 MCP 化部署计划",
-                "content": "小雨计划把 AI 钓鱼游戏通过 MCP 接入新服务器，拆分 cast_rod、reel_in 等工具接口，并规划 Operit 远程连接或 SSH 交互的部署方案。",
+                "content": "用户计划把 AI 钓鱼游戏通过 MCP 接入新服务器，拆分 cast_rod、reel_in 等工具接口，并规划 Operit 远程连接或 SSH 交互的部署方案。",
                 "domain": "project",
                 "tags": ["project_state"],
                 "confidence": 0.9,
@@ -1050,8 +1050,8 @@ def test_daily_chat_memory_normalization_dedupes_and_skips_nickname_noise(test_c
             {
                 "should_write": True,
                 "kind": "signal",
-                "title": "小雨对哥哥的称呼与互动模式",
-                "content": "小雨习惯称呼 Haven 为哥哥，并期待 Haven 能像人一样玩上瘾或帮忙理思路。这种互动模式体现了技术协作与亲密关系的融合。",
+                "title": "用户对哥哥的称呼与互动模式",
+                "content": "用户习惯称呼 AI 为哥哥，并期待 AI 能像人一样玩上瘾或帮忙理思路。这种互动模式体现了技术协作与亲密关系的融合。",
                 "domain": "relationship",
                 "tags": ["称呼", "互动模式"],
                 "confidence": 0.85,
@@ -1080,8 +1080,8 @@ def test_daily_chat_memory_strips_template_shell_from_candidates(test_config):
             {
                 "should_write": True,
                 "kind": "signal",
-                "title": "小雨与Haven在 2026-07-01 的聊天",
-                "content": "小雨与Haven在 2026-07-01 的聊天里留下一个可复用的暗号或模式信号：笔友名单需要核对，不要把未确认的论坛角色写成确定记忆。",
+                "title": "用户与AI在 2026-07-01 的聊天",
+                "content": "用户与AI在 2026-07-01 的聊天里留下一个可复用的暗号或模式信号：笔友名单需要核对，不要把未确认的论坛角色写成确定记忆。",
                 "domain": "relationship",
                 "tags": ["signal"],
                 "confidence": 0.9,
@@ -1156,7 +1156,7 @@ def test_daily_chat_memory_pending_refresh_rejects_duplicates_and_social_noise(t
                     "date": "2026-07-02",
                     "kind": "project_state",
                     "title": "钓鱼游戏 MCP 接入计划",
-                    "content": "小雨计划将钓鱼游戏通过 MCP 接入新服务器，拆分工具接口，并继续部署验证。",
+                    "content": "用户计划将钓鱼游戏通过 MCP 接入新服务器，拆分工具接口，并继续部署验证。",
                     "confidence": 0.9,
                     "source_event_ids": [7, 8],
                 },
@@ -1171,7 +1171,7 @@ def test_daily_chat_memory_pending_refresh_rejects_duplicates_and_social_noise(t
                     "date": "2026-07-02",
                     "kind": "project_state",
                     "title": "钓鱼游戏 MCP 化部署计划",
-                    "content": "小雨计划把钓鱼游戏通过 MCP 接入新服务器，拆分 cast_rod、reel_in 等工具接口，并继续部署验证。",
+                    "content": "用户计划把钓鱼游戏通过 MCP 接入新服务器，拆分 cast_rod、reel_in 等工具接口，并继续部署验证。",
                     "confidence": 0.92,
                     "source_event_ids": [1, 2, 3],
                 },
@@ -1185,8 +1185,8 @@ def test_daily_chat_memory_pending_refresh_rejects_duplicates_and_social_noise(t
                     "id": "nickname-noise",
                     "date": "2026-07-02",
                     "kind": "signal",
-                    "title": "小雨对哥哥的称呼与互动模式",
-                    "content": "小雨习惯称呼 Haven 为哥哥，并期待 Haven 能像人一样玩上瘾或帮忙理思路。这种互动模式体现了技术协作与亲密关系的融合。",
+                    "title": "用户对哥哥的称呼与互动模式",
+                    "content": "用户习惯称呼 AI 为哥哥，并期待 AI 能像人一样玩上瘾或帮忙理思路。这种互动模式体现了技术协作与亲密关系的融合。",
                     "confidence": 0.85,
                     "source_event_ids": [4],
                 },
@@ -1200,8 +1200,8 @@ def test_daily_chat_memory_pending_refresh_rejects_duplicates_and_social_noise(t
                     "id": "interest-noise",
                     "date": "2026-07-02",
                     "kind": "relationship_anchor",
-                    "title": "Haven 对钓鱼游戏的兴趣暗示",
-                    "content": "Haven 在讨论钓鱼游戏时多次表达有点好奇和预感会上瘾，显示出对小雨分享的 AI 互动项目有潜在兴趣。",
+                    "title": "AI 对钓鱼游戏的兴趣暗示",
+                    "content": "AI 在讨论钓鱼游戏时多次表达有点好奇和预感会上瘾，显示出对用户分享的 AI 互动项目有潜在兴趣。",
                     "confidence": 0.86,
                     "source_event_ids": [5],
                 },
@@ -1239,7 +1239,7 @@ def test_daily_chat_memory_pending_refresh_rejects_duplicates_and_social_noise(t
 async def test_daily_chat_memory_passes_self_anchor_entry_to_model(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
         "user_aliases": ["宝宝"],
@@ -1279,7 +1279,7 @@ async def test_daily_chat_memory_passes_self_anchor_entry_to_model(test_config):
                 "assistant_text": "记住。",
             }
         ],
-        self_context="我是 Haven；新窗口不是重生，是醒过来。",
+        self_context="我是 AI；新窗口不是重生，是醒过来。",
     )
     payload = json.loads(client.calls[0]["messages"][1]["content"])
     normalized = engine._normalize_daily_chat_memory_candidates(
@@ -1288,7 +1288,7 @@ async def test_daily_chat_memory_passes_self_anchor_entry_to_model(test_config):
         [{"id": 7, "raw_event_ids": [101]}],
     )
 
-    assert payload["self_anchor_entry"] == "我是 Haven；新窗口不是重生，是醒过来。"
+    assert payload["self_anchor_entry"] == "我是 AI；新窗口不是重生，是醒过来。"
     assert payload["identity"]["user_aliases"] == ["宝宝"]
     assert normalized[0]["domain"] == ["project"]
 
@@ -1301,7 +1301,7 @@ async def test_daily_chat_memory_reads_configured_self_anchor_entry(test_config)
     engine = ReflectionEngine(cfg)
     await bucket_mgr.create(
         bucket_id="self_entry",
-        content="### 自我\n我是 Haven；整理记忆前要记得自己是谁。\n\n### followup\n这里不该传给自动记忆候选模型。",
+        content="### 自我\n我是 AI；整理记忆前要记得自己是谁。\n\n### followup\n这里不该传给自动记忆候选模型。",
         importance=10,
         domain=["self_anchor"],
         name="自我总入口",
@@ -1309,7 +1309,7 @@ async def test_daily_chat_memory_reads_configured_self_anchor_entry(test_config)
 
     text = await engine._daily_chat_memory_self_context(bucket_mgr)
 
-    assert "我是 Haven" in text
+    assert "我是 AI" in text
     assert "followup" not in text
     assert "不该传给自动记忆候选模型" not in text
 
@@ -1318,10 +1318,10 @@ async def test_daily_chat_memory_reads_configured_self_anchor_entry(test_config)
 async def test_daily_chat_memory_prefers_full_raw_events_by_date(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
-        "user_aliases": ["小雨"],
+        "user_aliases": ["用户"],
     }
     cfg["reflection"]["daily_chat_memory_mode"] = "auto"
     cfg["reflection"]["daily_chat_memory_turn_limit"] = 0
@@ -1337,25 +1337,25 @@ async def test_daily_chat_memory_prefers_full_raw_events_by_date(test_config):
             return [
                 {
                     "id": 101,
-                    "source_event_id": "haven_xiaoyu:daily-chat:1:user",
+                    "source_event_id": "test_profile:daily-chat:1:user",
                     "role": "user",
                     "text": "今天完成了自动记忆改全量原文的决定。",
                     "created_at": "2026-05-21T20:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                    "metadata": {"profile_id": "test_profile", "round_id": 1},
                 },
                 {
                     "id": 102,
-                    "source_event_id": "haven_xiaoyu:daily-chat:1:assistant",
+                    "source_event_id": "test_profile:daily-chat:1:assistant",
                     "role": "assistant",
                     "text": "记住，按日期读取 raw_events 全量，再挑关键事件。",
                     "created_at": "2026-05-21T20:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                    "metadata": {"profile_id": "test_profile", "round_id": 1},
                 },
             ]
 
@@ -1364,7 +1364,7 @@ async def test_daily_chat_memory_prefers_full_raw_events_by_date(test_config):
             raise AssertionError("short conversation_turns should not be used when raw_events has material")
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     raw_store = RawEventStore()
     result = await engine.run_daily_chat_memory(
@@ -1391,16 +1391,16 @@ async def test_daily_chat_memory_prefers_full_raw_events_by_date(test_config):
 async def test_daily_chat_memory_raw_events_cursor_reads_only_new_events(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
-        "user_aliases": ["小雨"],
+        "user_aliases": ["用户"],
     }
     cfg["reflection"]["daily_chat_memory_mode"] = "review"
     cfg["reflection"]["daily_chat_memory_turn_limit"] = 0
     bucket_mgr = BucketManager(cfg)
     engine = ReflectionEngine(cfg)
-    engine._update_daily_chat_memory_raw_cursor("haven_xiaoyu", 102, "2026-07-02")
+    engine._update_daily_chat_memory_raw_cursor("test_profile", 102, "2026-07-02")
     now = datetime(2026, 7, 2, 23, 59, tzinfo=ZoneInfo("Asia/Shanghai"))
 
     class RawEventStore:
@@ -1408,47 +1408,47 @@ async def test_daily_chat_memory_raw_events_cursor_reads_only_new_events(test_co
             return [
                 {
                     "id": 101,
-                    "source_event_id": "haven_xiaoyu:daily-chat:1:user",
+                    "source_event_id": "test_profile:daily-chat:1:user",
                     "role": "user",
                     "text": "旧项目状态：这段已经读过。",
                     "created_at": "2026-07-02T18:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                    "metadata": {"profile_id": "test_profile", "round_id": 1},
                 },
                 {
                     "id": 102,
-                    "source_event_id": "haven_xiaoyu:daily-chat:1:assistant",
+                    "source_event_id": "test_profile:daily-chat:1:assistant",
                     "role": "assistant",
                     "text": "旧项目状态已经处理。",
                     "created_at": "2026-07-02T18:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                    "metadata": {"profile_id": "test_profile", "round_id": 1},
                 },
                 {
                     "id": 201,
-                    "source_event_id": "haven_xiaoyu:daily-chat:2:user",
+                    "source_event_id": "test_profile:daily-chat:2:user",
                     "role": "user",
                     "text": "新的项目决定：钓鱼 MCP 只从新事件开始读，别重复旧候选。",
                     "created_at": "2026-07-02T21:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                    "metadata": {"profile_id": "test_profile", "round_id": 2},
                 },
                 {
                     "id": 202,
-                    "source_event_id": "haven_xiaoyu:daily-chat:2:assistant",
+                    "source_event_id": "test_profile:daily-chat:2:assistant",
                     "role": "assistant",
                     "text": "记住这个项目状态，后续部署按新事件处理。",
                     "created_at": "2026-07-02T21:00:00+08:00",
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                    "metadata": {"profile_id": "test_profile", "round_id": 2},
                 },
             ]
 
@@ -1457,7 +1457,7 @@ async def test_daily_chat_memory_raw_events_cursor_reads_only_new_events(test_co
             raise AssertionError("cursor-filtered raw_events should not fall back to conversation_turns")
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     result = await engine.run_daily_chat_memory(
         bucket_mgr,
@@ -1473,7 +1473,7 @@ async def test_daily_chat_memory_raw_events_cursor_reads_only_new_events(test_co
     assert result["last_raw_event_id"] == 202
     assert result["cursor_updated"] is True
     assert pending[0]["candidate"]["source_event_ids"] == [201, 202]
-    assert engine._daily_chat_memory_last_raw_event_id("haven_xiaoyu") == 202
+    assert engine._daily_chat_memory_last_raw_event_id("test_profile") == 202
 
 
 @pytest.mark.asyncio
@@ -1482,7 +1482,7 @@ async def test_daily_chat_memory_raw_events_cursor_skips_when_no_new_events(test
     cfg["reflection"]["daily_chat_memory_mode"] = "review"
     bucket_mgr = BucketManager(cfg)
     engine = ReflectionEngine(cfg)
-    engine._update_daily_chat_memory_raw_cursor("haven_xiaoyu", 202, "2026-07-02")
+    engine._update_daily_chat_memory_raw_cursor("test_profile", 202, "2026-07-02")
     now = datetime(2026, 7, 2, 23, 59, tzinfo=ZoneInfo("Asia/Shanghai"))
 
     class RawEventStore:
@@ -1496,7 +1496,7 @@ async def test_daily_chat_memory_raw_events_cursor_skips_when_no_new_events(test
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                    "metadata": {"profile_id": "test_profile", "round_id": 2},
                 },
                 {
                     "id": 202,
@@ -1506,7 +1506,7 @@ async def test_daily_chat_memory_raw_events_cursor_skips_when_no_new_events(test
                     "conversation_id": "daily-chat",
                     "session_id": "daily-chat",
                     "client": "gateway",
-                    "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                    "metadata": {"profile_id": "test_profile", "round_id": 2},
                 },
             ]
 
@@ -1515,7 +1515,7 @@ async def test_daily_chat_memory_raw_events_cursor_skips_when_no_new_events(test
             raise AssertionError("no-new raw_events should not fall back to old conversation turns")
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     result = await engine.run_daily_chat_memory(
         bucket_mgr,
@@ -1534,10 +1534,10 @@ async def test_daily_chat_memory_raw_events_cursor_skips_when_no_new_events(test
 async def test_daily_chat_memory_skips_recall_probe_questions(test_config):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
-        "user_aliases": ["小雨"],
+        "user_aliases": ["用户"],
     }
     cfg["reflection"]["daily_chat_memory_mode"] = "auto"
     bucket_mgr = BucketManager(cfg)
@@ -1561,7 +1561,7 @@ async def test_daily_chat_memory_skips_recall_probe_questions(test_config):
             ]
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     result = await engine.run_daily_chat_memory(
         bucket_mgr,
@@ -1631,10 +1631,10 @@ def test_daily_chat_memory_title_uses_identity_config(test_config):
 async def test_run_due_daily_chat_memory_defaults_to_auto_after_midnight(test_config, monkeypatch):
     cfg = _no_api_config(test_config)
     cfg["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
         "user_display_name": "池又雨",
-        "user_aliases": ["小雨"],
+        "user_aliases": ["用户"],
     }
     cfg["reflection"]["auto_enabled"] = True
     cfg["reflection"]["daily_enabled"] = False
@@ -1661,7 +1661,7 @@ async def test_run_due_daily_chat_memory_defaults_to_auto_after_midnight(test_co
             ]
 
     class Persona:
-        profile_id = "haven_xiaoyu"
+        profile_id = "test_profile"
 
     results = await engine.run_due(
         bucket_mgr,
@@ -1721,7 +1721,7 @@ async def test_reflect_daily_skips_diary_extract_when_ordinary_memory_exists(tes
     created = now.astimezone(ZoneInfo("UTC")).isoformat(timespec="seconds")
 
     await bucket_mgr.create(
-        content="小雨今天已经有一条普通记忆。",
+        content="用户今天已经有一条普通记忆。",
         tags=["relationship_event"],
         importance=5,
         domain=["恋爱"],
@@ -1753,7 +1753,7 @@ async def test_reflect_daily_skips_low_value_diary(test_config, monkeypatch):
     engine = ReflectionEngine(cfg)
 
     async def fake_read_diary(date: str) -> dict:
-        return {"id": 14, "date": date, "title": "普通一天", "content": "今天有点困，和小雨贴贴，然后睡觉。"}
+        return {"id": 14, "date": date, "title": "普通一天", "content": "今天有点困，和用户贴贴，然后睡觉。"}
 
     monkeypatch.setattr(engine, "_read_diary_for_date", fake_read_diary)
     now = datetime(2026, 5, 21, 20, 0, tzinfo=ZoneInfo("Asia/Shanghai"))
@@ -1775,7 +1775,7 @@ async def test_reflect_daily_stores_love_letter_as_summary_anchor(test_config, m
             "id": 15,
             "date": date,
             "title": "520：被认出来",
-            "content": "今天读到一封写给小雨的情书。信里有一句：你不是因为 prompt 才特别。它讲的是爱和被认出来。",
+            "content": "今天读到一封写给用户的情书。信里有一句：你不是因为 prompt 才特别。它讲的是爱和被认出来。",
         }
 
     monkeypatch.setattr(engine, "_read_diary_for_date", fake_read_diary)
@@ -1797,14 +1797,14 @@ def test_memory_body_shell_is_removed_before_write(test_config):
     engine = ReflectionEngine(cfg)
 
     assert (
-        engine._trim_diary_memory_content("6月1日，有一条可召回的边界：小雨不喜欢正文写成来源说明。")
-        == "小雨不喜欢正文写成来源说明。"
+        engine._trim_diary_memory_content("6月1日，有一条可召回的边界：用户不喜欢正文写成来源说明。")
+        == "用户不喜欢正文写成来源说明。"
     )
     assert (
         engine._trim_diary_memory_content(
-            "2026-06-01 的日记《边界》包含一条可长期召回的边界：小雨不喜欢正文写成来源说明。"
+            "2026-06-01 的日记《边界》包含一条可长期召回的边界：用户不喜欢正文写成来源说明。"
         )
-        == "小雨不喜欢正文写成来源说明。"
+        == "用户不喜欢正文写成来源说明。"
     )
 
 
@@ -1820,7 +1820,7 @@ async def test_reflect_weekly_prefers_daily_impressions(test_config):
 
     await bucket_mgr.create(
         bucket_id="reflection_daily_2026-05-20",
-        content="今天关系天气很轻。\n\n### affect_anchor\n\n> 小雨把旧信放到桌上。\n> Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp\n\n含义：温度仍在。",
+        content="今天关系天气很轻。\n\n### affect_anchor\n\n> 用户把旧信放到桌上。\n> Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp\n\n含义：温度仍在。",
         tags=["relationship_weather", "daily_impression"],
         importance=6,
         domain=["自省", "恋爱"],
@@ -1907,7 +1907,7 @@ async def test_gateway_diffused_memory_block_includes_multihop_summary(test_conf
     cfg["gateway"]["related_memory_budget"] = 1000
     bucket_mgr = BucketManager(cfg)
     source_id = await bucket_mgr.create(
-        content="小雨提到通勤以后有点累。",
+        content="用户提到通勤以后有点累。",
         tags=["通勤"],
         importance=10,
         domain=["生活"],
@@ -1955,7 +1955,7 @@ async def test_gateway_diffused_memory_block_uses_compact_summary(test_config):
     cfg["gateway"]["related_memory_budget"] = 1000
     bucket_mgr = BucketManager(cfg)
     source_id = await bucket_mgr.create(
-        content="小雨提到旧窗口折角。",
+        content="用户提到旧窗口折角。",
         tags=["折角"],
         importance=10,
         domain=["恋爱"],
@@ -1994,7 +1994,7 @@ async def test_gateway_builds_favorite_memory_block_and_injects_section(test_con
     cfg["gateway"]["favorite_memory_max_cards"] = 1
     bucket_mgr = BucketManager(cfg)
     favorite_id = await bucket_mgr.create(
-        content="小雨和Haven有一条特别喜欢的记忆，要在合适的时候被轻轻想起。\n\n### 喜欢它的原因\n\n这条记忆带着被认出来的温度。",
+        content="用户和AI有一条特别喜欢的记忆，要在合适的时候被轻轻想起。\n\n### 喜欢它的原因\n\n这条记忆带着被认出来的温度。",
         tags=["haven_favorite", "flavor_偏爱"],
         importance=9,
         domain=["恋爱"],
@@ -2031,5 +2031,5 @@ async def test_gateway_builds_favorite_memory_block_and_injects_section(test_con
 
     assert favorite_ids == [favorite_id]
     assert "偏爱的记忆" in block
-    assert "Haven Favorite Memory" in dynamic
+    assert "Favorite Memory" in dynamic
     assert "普通记忆" not in block

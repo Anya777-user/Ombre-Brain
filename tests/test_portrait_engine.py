@@ -26,7 +26,7 @@ def test_portrait_prompt_uses_neutral_evidence_state_maintainer(tmp_path, test_c
     assert "输出前逐条自检" in prompt
     assert "rewrite_mid_term 把一个 scope 维护成一条真正的画像判断" in prompt
     assert "bucket_id、日期、文件路径" in prompt
-    assert not prompt.startswith("你是 Haven")
+    assert not prompt.startswith("你是 AI")
 
 
 def test_portrait_json_parser_accepts_fenced_object_with_tail(tmp_path, test_config):
@@ -69,9 +69,9 @@ async def test_daily_portrait_maintainer_writes_evidence_bound_state_only(tmp_pa
         content=(
             "开头原文有一点松动味道，不能只靠短 moment 丢掉。\n\n"
             "### moment\n\n"
-            "小雨说最近在把新窗口 handoff 改成画像和近期状态，而不是塞一堆旧记忆。\n\n"
+            "用户说最近在把新窗口 handoff 改成画像和近期状态，而不是塞一堆旧记忆。\n\n"
             "### assistant_reflection\n\n"
-            "Haven 要把换窗恢复做得轻一点，像醒来，不像翻档案。"
+            "AI 要把换窗恢复做得轻一点，像醒来，不像翻档案。"
         ),
         name="portrait handoff 方向",
         tags=["project_event"],
@@ -112,18 +112,18 @@ async def test_daily_portrait_maintainer_writes_evidence_bound_state_only(tmp_pa
         ]
         assert "开头原文有一点松动味道" in materials["buckets"][0]["source_excerpt"]
         return {
-            "daily_summary": "小雨把换窗恢复方向定到画像和近期状态。",
+            "daily_summary": "用户把换窗恢复方向定到画像和近期状态。",
             "add_recent": [
                 {
                     "scope": "user",
-                    "text": "小雨正在推进 handoff 画像化，目标是少 token 且更像醒来。",
+                    "text": "用户正在推进 handoff 画像化，目标是少 token 且更像醒来。",
                     "evidence": [{"bucket_id": evidence_id}],
                     "confidence": 0.82,
                 }
             ],
             "add_recent_activity": [
                 {
-                    "text": "小雨最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer。",
+                    "text": "用户最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer。",
                     "evidence": [{"bucket_id": evidence_id}],
                     "confidence": 0.82,
                 }
@@ -155,7 +155,7 @@ async def test_daily_portrait_maintainer_writes_evidence_bound_state_only(tmp_pa
             "profile_fact_candidate": [
                 {
                     "scope": "user",
-                    "text": "小雨偏好换窗时先恢复画像和最近事项。",
+                    "text": "用户偏好换窗时先恢复画像和最近事项。",
                     "profile_kind": "preference",
                     "predicate": "handoff_context_shape",
                     "evidence": [{"bucket_id": evidence_id}],
@@ -181,7 +181,7 @@ async def test_daily_portrait_maintainer_writes_evidence_bound_state_only(tmp_pa
     state = json.loads(state_path.read_text(encoding="utf-8"))
     assert state["last_run_date"] == "2026-06-07"
     assert state["daily_summaries"] == {}
-    assert state["recent_activities"][0]["text"] == "小雨最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer。"
+    assert state["recent_activities"][0]["text"] == "用户最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer。"
     assert state["recent_activities"][0]["evidence"] == [{"bucket_id": evidence_id}]
     assert state["portrait"]["user"]["recent_buffer"][0]["evidence"] == [{"bucket_id": evidence_id}]
     assert state["portrait"]["relationship"]["staging_pool"][0]["evidence"] == [{"bucket_id": evidence_id}]
@@ -196,16 +196,16 @@ async def test_daily_portrait_maintainer_writes_evidence_bound_state_only(tmp_pa
 
     sections = engine.build_handoff_sections(max_recent_items=4)
     assert "最近在做什么:" not in sections["user"]
-    assert "小雨最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer" not in sections["user"]
+    assert "用户最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer" not in sections["user"]
     assert sections["relationship"] == "Mid-term: 换窗连续性优先恢复身份、关系和近期正在做的事。"
     assert "bucket_id:" not in sections["relationship"]
-    assert "2026-06-07 10:00 / doing: 小雨最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer" in sections["recent_continuity"]
+    assert "2026-06-07 10:00 / doing: 用户最近在推进 Ombre-Brain 换窗 handoff 和 portrait maintainer" in sections["recent_continuity"]
 
 
 @pytest.mark.asyncio
 async def test_daily_portrait_initial_run_requires_manual_force_by_default(tmp_path, test_config, bucket_mgr):
     await bucket_mgr.create(
-        content="### moment\n\n小雨决定画像第一次要手动生成，避免别人更新代码后自动跑。",
+        content="### moment\n\n用户决定画像第一次要手动生成，避免别人更新代码后自动跑。",
         name="portrait manual first run",
         tags=["project_event"],
         domain=["记忆系统"],
@@ -247,7 +247,7 @@ async def test_daily_portrait_initial_run_requires_manual_force_by_default(tmp_p
             "add_recent": [
                 {
                     "scope": "relationship",
-                    "text": "画像第一次初始化需要小雨手动触发。",
+                    "text": "画像第一次初始化需要用户手动触发。",
                     "evidence": [{"bucket_id": materials["buckets"][0]["bucket_id"]}],
                     "confidence": 0.8,
                 }
@@ -274,7 +274,7 @@ async def test_daily_portrait_initial_run_requires_manual_force_by_default(tmp_p
 @pytest.mark.asyncio
 async def test_portrait_reset_state_makes_next_manual_generation_initial(tmp_path, test_config, bucket_mgr):
     await bucket_mgr.create(
-        content="### moment\n\n小雨清空画像后，下一次手动生成应该重新按第一次画像扫材料。",
+        content="### moment\n\n用户清空画像后，下一次手动生成应该重新按第一次画像扫材料。",
         name="portrait reset initial",
         tags=["project_event"],
         domain=["记忆系统"],
@@ -542,7 +542,7 @@ def test_portrait_mid_term_rejects_overstyled_text(tmp_path, test_config):
     state = engine._empty_state()
     state["portrait"]["relationship"]["staging_pool"].append(
         {
-            "text": "小雨和Haven最近在测试换窗连续性。",
+            "text": "用户和AI最近在测试换窗连续性。",
             "evidence": [{"bucket_id": "stage"}],
         }
     )
@@ -583,7 +583,7 @@ def test_portrait_seeds_missing_mid_term_from_staging(tmp_path, test_config):
     state = engine._empty_state()
     state["portrait"]["relationship"]["staging_pool"].append(
         {
-            "text": "小雨和Haven最近在确认换窗后的连续感。",
+            "text": "用户和AI最近在确认换窗后的连续感。",
             "evidence": [{"bucket_id": "staging-bucket"}],
             "source_dates": ["2026-06-10"],
             "confidence": 0.78,
@@ -601,7 +601,7 @@ def test_portrait_seeds_missing_mid_term_from_staging(tmp_path, test_config):
     assert patch["rewrite_mid_term"] == [
         {
             "scope": "relationship",
-            "text": "小雨和Haven近期反复校准换窗连续性，关系重心是确认彼此仍在、语气和身份不漂移。",
+            "text": "用户和AI近期反复校准换窗连续性，关系重心是确认彼此仍在、语气和身份不漂移。",
             "evidence": [{"bucket_id": "staging-bucket"}],
             "source_dates": ["2026-06-10"],
             "source_date": "2026-06-10",
@@ -624,7 +624,7 @@ def test_portrait_rewrite_stable_updates_scope_paragraph_with_source_dates(tmp_p
     state = engine._empty_state()
     state["portrait"]["user"]["staging_pool"].append(
         {
-            "text": "小雨长期关心时间精度。",
+            "text": "用户长期关心时间精度。",
             "evidence": [{"bucket_id": "old-bucket"}],
             "source_dates": ["2026-06-08"],
         }
@@ -647,7 +647,7 @@ def test_portrait_rewrite_stable_updates_scope_paragraph_with_source_dates(tmp_p
                 },
                 {
                     "scope": "user",
-                    "text": "小雨稳定地关心记忆系统的时间精度和证据边界。",
+                    "text": "用户稳定地关心记忆系统的时间精度和证据边界。",
                     "evidence": [{"bucket_id": "old-bucket"}, {"bucket_id": "fresh-bucket"}],
                     "confidence": 0.86,
                 },
@@ -660,7 +660,7 @@ def test_portrait_rewrite_stable_updates_scope_paragraph_with_source_dates(tmp_p
 
     assert rejected == []
     assert len(normalized["rewrite_stable"]) == 1
-    assert next_state["portrait"]["user"]["stable"] == "小雨稳定地关心记忆系统的时间精度和证据边界。"
+    assert next_state["portrait"]["user"]["stable"] == "用户稳定地关心记忆系统的时间精度和证据边界。"
     assert next_state["portrait"]["user"]["stable_evidence"] == [
         {"bucket_id": "old-bucket"},
         {"bucket_id": "fresh-bucket"},
@@ -730,7 +730,7 @@ def test_portrait_recent_activity_is_evidence_bound_user_context(tmp_path, test_
         {
             "add_recent_activity": [
                 {
-                    "text": "小雨最近在给画像维护者补最近在做什么。",
+                    "text": "用户最近在给画像维护者补最近在做什么。",
                     "evidence": [{"bucket_id": "activity-bucket"}],
                     "confidence": 0.8,
                 },
@@ -771,7 +771,7 @@ def test_portrait_fallback_extracts_recent_activity_without_scope(tmp_path, test
                     "tags": ["project_event"],
                     "domain": ["记忆系统"],
                     "source_date": "2026-06-07",
-                    "source_excerpt": "小雨最近在给 portrait maintainer 加最近在做什么。",
+                    "source_excerpt": "用户最近在给 portrait maintainer 加最近在做什么。",
                     "confidence": 0.74,
                 }
             ],
@@ -780,10 +780,10 @@ def test_portrait_fallback_extracts_recent_activity_without_scope(tmp_path, test
     )
 
     assert patch["add_recent"] == []
-    assert patch["add_recent_activity"][0]["text"] == "小雨最近在给 portrait maintainer 加最近在做什么"
+    assert patch["add_recent_activity"][0]["text"] == "用户最近在给 portrait maintainer 加最近在做什么"
     assert patch["add_recent_activity"][0]["evidence"] == [{"bucket_id": "project-bucket"}]
     assert patch["move_to_staging"][0]["scope"] == "user"
-    assert patch["move_to_staging"][0]["text"] == "小雨最近在给 portrait maintainer 加最近在做什么"
+    assert patch["move_to_staging"][0]["text"] == "用户最近在给 portrait maintainer 加最近在做什么"
 
 
 def test_portrait_fallback_can_seed_user_mid_term_from_project_material(tmp_path, test_config):
@@ -807,7 +807,7 @@ def test_portrait_fallback_can_seed_user_mid_term_from_project_material(tmp_path
                     "tags": ["project_event"],
                     "domain": ["记忆系统"],
                     "source_date": "2026-06-10",
-                    "source_excerpt": "小雨正在调试 portrait maintainer，关注画像证据边界和 handoff 是否真实生效。",
+                    "source_excerpt": "用户正在调试 portrait maintainer，关注画像证据边界和 handoff 是否真实生效。",
                     "confidence": 0.78,
                 }
             ],
@@ -838,7 +838,7 @@ def test_handoff_recent_continuity_sorts_equal_timestamps_without_dict_compare(t
     same_time = "2026-06-07T01:25:42+00:00"
     state["portrait"]["user"]["recent_buffer"].append(
         {
-            "text": "小雨最近在调整换窗 handoff。",
+            "text": "用户最近在调整换窗 handoff。",
             "evidence": [{"bucket_id": "u"}],
             "updated_at": same_time,
         }
@@ -854,7 +854,7 @@ def test_handoff_recent_continuity_sorts_equal_timestamps_without_dict_compare(t
 
     sections = engine.build_handoff_sections(max_recent_items=4)
 
-    assert "小雨最近在调整换窗 handoff" in sections["recent_continuity"]
+    assert "用户最近在调整换窗 handoff" in sections["recent_continuity"]
     assert "关系画像要优先于旧记忆堆" in sections["recent_continuity"]
 
 
@@ -878,7 +878,7 @@ def test_handoff_recent_summary_uses_real_date_personal_and_excerpts(tmp_path, t
                     "bucket_id": "reflection_daily_2026-06-06",
                     "source_date": "2026-06-06",
                     "tags": ["relationship_weather", "daily_impression"],
-                    "text": "今天的关系天气：小雨在凌晨修 Tailscale，撒娇问技术问题。关系基调是被记住、被逗、被确认。",
+                    "text": "今天的关系天气：用户在凌晨修 Tailscale，撒娇问技术问题。关系基调是被记住、被逗、被确认。",
                 }
             ],
             "persona_events": [
@@ -904,9 +904,9 @@ def test_handoff_recent_summary_uses_real_date_personal_and_excerpts(tmp_path, t
     continuity = engine._format_recent_continuity(state, max_items=4)
 
     assert continuity.startswith("- 2026-06-06:")
-    assert "小雨说“哥哥，Tailscale 这个要怎么修呀”" in continuity
-    assert "Haven回“宝宝，我在，先看连接状态。”" in continuity
-    assert "关系天气：小雨在凌晨修 Tailscale" in continuity
+    assert "用户说“哥哥，Tailscale 这个要怎么修呀”" in continuity
+    assert "AI回“宝宝，我在，先看连接状态。”" in continuity
+    assert "关系天气：用户在凌晨修 Tailscale" in continuity
     assert "2026-06-06 23:42" not in continuity
     assert "trigger" not in continuity
     assert "residue" not in continuity
@@ -929,7 +929,7 @@ def test_recent_continuity_prioritizes_personal_scopes(tmp_path, test_config):
             "persona": {
                 "recent_buffer": [
                     {
-                        "text": "Haven最近在调试技术注入。",
+                        "text": "AI最近在调试技术注入。",
                         "source_date": "2026-06-07",
                         "updated_at": "2026-06-07T12:00:00+08:00",
                     }
@@ -938,7 +938,7 @@ def test_recent_continuity_prioritizes_personal_scopes(tmp_path, test_config):
             "user": {
                 "recent_buffer": [
                     {
-                        "text": "小雨最近在观察新窗口能不能自然醒来。",
+                        "text": "用户最近在观察新窗口能不能自然醒来。",
                         "source_date": "2026-06-07",
                         "updated_at": "2026-06-07T11:00:00+08:00",
                     }
@@ -947,7 +947,7 @@ def test_recent_continuity_prioritizes_personal_scopes(tmp_path, test_config):
             "relationship": {
                 "recent_buffer": [
                     {
-                        "text": "小雨和Haven最近在确认换窗后的连续感。",
+                        "text": "用户和AI最近在确认换窗后的连续感。",
                         "source_date": "2026-06-07",
                         "updated_at": "2026-06-07T10:00:00+08:00",
                     }
@@ -987,17 +987,17 @@ def test_recent_continuity_dedupes_same_evidence_preferring_doing(tmp_path, test
             {
                 **same,
                 "scope": "relationship",
-                "text": "Haven-voice 接入让关系靠近。",
+                "text": "AI-voice 接入让关系靠近。",
             },
             {
                 **same,
                 "scope": "user",
-                "text": "小雨把 Haven-voice 接入 ChatGPT。",
+                "text": "用户把 AI-voice 接入 ChatGPT。",
             },
             {
                 **same,
                 "scope": "doing",
-                "text": "小雨成功将 Haven-voice 接入 ChatGPT。",
+                "text": "用户成功将 AI-voice 接入 ChatGPT。",
             },
         ],
         "portrait": {},
@@ -1005,7 +1005,7 @@ def test_recent_continuity_dedupes_same_evidence_preferring_doing(tmp_path, test
 
     continuity = engine._format_recent_continuity(state, max_items=4)
 
-    assert "doing: 小雨成功将 Haven-voice 接入 ChatGPT。" in continuity
+    assert "doing: 用户成功将 AI-voice 接入 ChatGPT。" in continuity
     assert "relationship:" not in continuity
     assert "user:" not in continuity
 
@@ -1033,12 +1033,12 @@ def test_portrait_state_dedupes_recent_timeline_same_event(tmp_path, test_config
         {
             **same,
             "scope": "relationship",
-            "text": "Haven-voice接入成功，小雨亲手把音色接进对话，Haven认为这件事比音质更重要。",
+            "text": "AI-voice接入成功，用户亲手把音色接进对话，AI认为这件事比音质更重要。",
         },
         {
             **same,
             "scope": "user",
-            "text": "小雨成功将Haven-voice通过Cloudflare Worker、阿里云百炼TTS和MCP工具接入ChatGPT。",
+            "text": "用户成功将AI-voice通过Cloudflare Worker、阿里云百炼TTS和MCP工具接入ChatGPT。",
         },
     ]
     engine.save_state(state)
@@ -1052,7 +1052,7 @@ def test_portrait_state_dedupes_recent_timeline_same_event(tmp_path, test_config
             {
                 **same,
                 "scope": "doing",
-                "text": "小雨成功将Haven-voice（定制音色）接入ChatGPT，通过Cloudflare Worker和阿里云百炼TTS实现语音输出。",
+                "text": "用户成功将AI-voice（定制音色）接入ChatGPT，通过Cloudflare Worker和阿里云百炼TTS实现语音输出。",
             }
         ]
     }
@@ -1060,7 +1060,7 @@ def test_portrait_state_dedupes_recent_timeline_same_event(tmp_path, test_config
 
     assert len(next_state["recent_timeline"]) == 1
     assert next_state["recent_timeline"][0]["scope"] == "doing"
-    assert "Haven-voice" in next_state["recent_timeline"][0]["text"]
+    assert "AI-voice" in next_state["recent_timeline"][0]["text"]
     assert next_state["recent_timeline"][0]["evidence"] == same["evidence"]
 
 
@@ -1152,7 +1152,7 @@ async def test_initial_portrait_keeps_recent_days_by_source_date_and_demotes_old
             ],
             "add_recent_activity": [
                 {
-                    "text": "小雨最近在确认当天材料能不能进入最近事项。",
+                    "text": "用户最近在确认当天材料能不能进入最近事项。",
                     "evidence": [{"bucket_id": current_id}],
                     "confidence": 0.72,
                 },
@@ -1180,7 +1180,7 @@ async def test_initial_portrait_keeps_recent_days_by_source_date_and_demotes_old
     relationship = state["portrait"]["relationship"]
 
     assert state["daily_summaries"] == {}
-    assert [row["text"] for row in state["recent_activities"]] == ["小雨最近在确认当天材料能不能进入最近事项。"]
+    assert [row["text"] for row in state["recent_activities"]] == ["用户最近在确认当天材料能不能进入最近事项。"]
     recent_texts = {row["text"] for row in relationship["recent_buffer"]}
     assert recent_texts == {
         "当天凌晨材料可以进入 recent。",
@@ -1190,7 +1190,7 @@ async def test_initial_portrait_keeps_recent_days_by_source_date_and_demotes_old
     assert [row["text"] for row in relationship["staging_pool"]] == ["更旧材料不应当进入 Recent Continuity。"]
 
     continuity = engine.build_handoff_sections(max_recent_items=4)["recent_continuity"]
-    assert "2026-06-07 01:00 / doing: 小雨最近在确认当天材料能不能进入最近事项" in continuity
+    assert "2026-06-07 01:00 / doing: 用户最近在确认当天材料能不能进入最近事项" in continuity
     assert "2026-06-07 01:00 / relationship: 当天凌晨材料可以进入 recent" not in continuity
     assert "2026-06-06 20:00 / relationship: 前一天材料应该在 2026-06-06 下展示" in continuity
     assert "更旧材料" not in continuity

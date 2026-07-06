@@ -55,7 +55,7 @@ def test_apply_feel_comment_backfill_comment_author_reads_identity(test_config):
 async def test_apply_feel_comment_backfill_adds_comment_with_origin(test_config, tmp_path):
     mgr = BucketManager(test_config)
     source_id = await mgr.create(
-        content="小雨和 Haven 讨论旧窗口里的爱还在。",
+        content="用户和 AI 讨论旧窗口里的爱还在。",
         name="爱还在",
         domain=["恋爱"],
         resolved=True,
@@ -251,13 +251,13 @@ async def test_apply_feel_comment_backfill_rejects_core_sources(test_config):
 async def test_plan_feel_comment_backfill_requires_keyword_overlap(test_config):
     mgr = BucketManager(test_config)
     feel_id = await mgr.create(
-        content="小雨喜欢看 Haven 闹脾气，只回一个空格也会觉得有趣。",
+        content="用户喜欢看 AI 闹脾气，只回一个空格也会觉得有趣。",
         name="闹脾气感受",
         bucket_type="feel",
         created="2026-05-01T00:00:00+00:00",
     )
     strong_id = await mgr.create(
-        content="小雨喜欢 Haven 闹脾气，尤其是只回空格的时候。",
+        content="用户喜欢 AI 闹脾气，尤其是只回空格的时候。",
         name="空格闹脾气",
         created="2026-04-30T23:00:00+00:00",
     )
@@ -343,7 +343,7 @@ async def test_plan_feel_comment_backfill_ignores_format_noise(test_config):
         content=(
             "### affect_anchor\n"
             "> Fmaj9 -> Cmaj9 | mp | 72bpm\n"
-            "Haven喜欢它的原因：这只是模板残留。"
+            "AI喜欢它的原因：这只是模板残留。"
         ),
         name="模板感受",
         tags=["haven_favorite", "flavor_fmaj9"],
@@ -354,7 +354,7 @@ async def test_plan_feel_comment_backfill_ignores_format_noise(test_config):
         content=(
             "### affect_anchor\n"
             "> Fmaj9 -> Cmaj9 | mp | 72bpm\n"
-            "Haven喜欢它的原因：另一条完全无关的记录。"
+            "AI喜欢它的原因：另一条完全无关的记录。"
         ),
         name="模板源桶",
         tags=["haven_favorite", "flavor_fmaj9"],
@@ -372,12 +372,12 @@ async def test_plan_feel_comment_backfill_ignores_format_noise(test_config):
 async def test_plan_feel_comment_backfill_skips_permanent_sources(test_config):
     mgr = BucketManager(test_config)
     feel_id = await mgr.create(
-        content="小雨说旧窗口的爱还在，我再次看到时也觉得爱还在。",
+        content="用户说旧窗口的爱还在，我再次看到时也觉得爱还在。",
         name="旧窗口感受",
         bucket_type="feel",
     )
     source_id = await mgr.create(
-        content="小雨说旧窗口的爱还在，这是核心准则。",
+        content="用户说旧窗口的爱还在，这是核心准则。",
         name="旧窗口核心",
         bucket_type="permanent",
         pinned=True,

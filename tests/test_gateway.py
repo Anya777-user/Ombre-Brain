@@ -134,7 +134,7 @@ class CountingBucketManager:
 
 class DummyPersonaEngine:
     enabled = True
-    profile_id = "haven_xiaoyu"
+    profile_id = "test_profile"
     mode = "test"
     model = "dummy-persona"
     api_key = "dummy"
@@ -715,10 +715,10 @@ def test_gateway_state_store_cooldown_curve(tmp_path):
     assert store.get_last_recent_context_at("sess-a") == origin + timedelta(minutes=5)
 
     store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-a",
         round_id=1,
-        user_text="暗号是星河折纸",
+        user_text="暗号是alpha-seven",
         assistant_text="我记住了。",
         model="dummy-model",
         client="unit-test",
@@ -726,13 +726,13 @@ def test_gateway_state_store_cooldown_curve(tmp_path):
         created_at=origin + timedelta(minutes=6),
     )
     turns = store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         limit=5,
         hours=24 * 365,
     )
     assert len(turns) == 1
     assert turns[0]["session_id"] == "sess-a"
-    assert turns[0]["user_text"] == "暗号是星河折纸"
+    assert turns[0]["user_text"] == "暗号是alpha-seven"
     assert turns[0]["assistant_text"] == "我记住了。"
 
     store.record_upstream_usage(
@@ -795,7 +795,7 @@ def test_gateway_mirrors_successful_turn_to_raw_events(monkeypatch, test_config,
     )
 
     turns = state_store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-raw-mirror",
         limit=5,
         hours=1,
@@ -812,8 +812,8 @@ def test_gateway_mirrors_successful_turn_to_raw_events(monkeypatch, test_config,
     assert raw["count"] == 2
     assert {item["role"] for item in raw["items"]} == {"user", "assistant"}
     assert {item["source_event_id"] for item in raw["items"]} == {
-        "haven_xiaoyu:sess-raw-mirror:7:user",
-        "haven_xiaoyu:sess-raw-mirror:7:assistant",
+        "test_profile:sess-raw-mirror:7:user",
+        "test_profile:sess-raw-mirror:7:assistant",
     }
     user_raw = next(item for item in raw["items"] if item["role"] == "user")
     assert user_raw["text"] == "小雨这句原文要进保险箱"
@@ -852,7 +852,7 @@ def test_gateway_skips_tool_only_assistant_turn_for_short_and_raw_tables(
 
     assert (
         state_store.list_recent_conversation_turns(
-            profile_id="haven_xiaoyu",
+            profile_id="test_profile",
             session_id="sess-tool-only",
             limit=5,
             hours=1,
@@ -883,7 +883,7 @@ def test_gateway_filters_injected_context_before_short_and_raw_tables(
         route="/v1/chat/completions",
     )
     turns = state_store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-injected-user",
         limit=5,
         hours=1,
@@ -908,7 +908,7 @@ def test_gateway_filters_injected_context_before_short_and_raw_tables(
         route="/v1/chat/completions",
     )
     turns = state_store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-injected-assistant",
         limit=5,
         hours=1,
@@ -933,7 +933,7 @@ def test_gateway_filters_injected_context_before_short_and_raw_tables(
         route="/v1/chat/completions",
     )
     assert state_store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-all-injected",
         limit=5,
         hours=1,
@@ -1236,7 +1236,7 @@ def test_gateway_memory_sentinel_tone_only_skips_dynamic_and_recent_context(
         embedding_results=[(bucket_id, 0.99)],
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-sentinel-tone",
         round_id=1,
         user_text="之前聊过住院的事。",
@@ -1379,7 +1379,7 @@ def test_gateway_memory_sentinel_checkin_does_not_exact_bypass(
         embedding_results=[(bucket_id, 0.99)],
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-sentinel-checkin",
         round_id=1,
         user_text="刚才在说天气。",
@@ -1478,7 +1478,7 @@ def test_gateway_memory_sentinel_search_uses_recent_turns_for_vague_followup(
     )
     monkeypatch.setattr(service, "_admit_bucket_for_recall", lambda query, item: True)
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-sentinel-followup",
         round_id=1,
         user_text="我当时住院检查，医生说要等结果。",
@@ -1537,7 +1537,7 @@ def test_gateway_memory_sentinel_llm_disabled_skips_grey_zone_model_call(
         embedding_results={"后来呢": [(bucket_id, 0.95)]},
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-sentinel-llm-off",
         round_id=1,
         user_text="我当时住院检查，医生说要等结果。",
@@ -1950,7 +1950,7 @@ def test_gateway_persona_recent_context_uses_same_session_previous_turns(
     )
     service.persona_engine.evaluation_context_turns = 2
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-persona",
         round_id=1,
         user_text="哥哥，先收下。",
@@ -1961,7 +1961,7 @@ def test_gateway_persona_recent_context_uses_same_session_previous_turns(
         created_at=datetime.now(timezone.utc) - timedelta(minutes=3),
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="other-window",
         round_id=1,
         user_text="别的窗口不该进来。",
@@ -1972,7 +1972,7 @@ def test_gateway_persona_recent_context_uses_same_session_previous_turns(
         created_at=datetime.now(timezone.utc) - timedelta(minutes=2),
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="sess-persona",
         round_id=2,
         user_text="那回来要带利息",
@@ -2946,7 +2946,7 @@ def test_gateway_streams_native_anthropic_messages(monkeypatch, test_config, buc
     turns = [
         turn
         for turn in state_store.list_recent_conversation_turns(
-            profile_id="haven_xiaoyu",
+            profile_id="test_profile",
             limit=5,
             hours=1,
         )
@@ -7002,11 +7002,11 @@ def test_gateway_just_now_context_uses_conversation_turns_and_skips_memory_recal
         embedding_queries=embedding_queries,
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="window-one",
         round_id=1,
-        user_text="哥哥，我们刚刚的暗号是星河折纸。",
-        assistant_text="记住了，星河折纸。",
+        user_text="哥哥，我们刚刚的暗号是alpha-seven。",
+        assistant_text="记住了，alpha-seven。",
         model="dummy",
         client="unit-test",
         route="/v1/chat/completions",
@@ -7025,7 +7025,7 @@ def test_gateway_just_now_context_uses_conversation_turns_and_skips_memory_recal
     assert recalled_ids == []
     assert embedding_queries == []
     assert "Just Now Chat Context" in injected
-    assert "星河折纸" in injected
+    assert "alpha-seven" in injected
     assert "旧窗口折角" not in injected
     assert "Recalled Memory" not in injected
     assert "Recent Context" not in injected
@@ -7035,6 +7035,130 @@ def test_gateway_just_now_context_uses_conversation_turns_and_skips_memory_recal
     assert debug["date_persona_trace_injected"] is False
     assert debug["query_planner_debug"]["skip_reason"] == "just_now_context"
     assert debug["injected_bucket_ids"] == []
+
+
+def test_list_recent_conversation_turns_cross_window_no_session_id(
+    monkeypatch,
+    test_config,
+    bucket_mgr,
+):
+    """list_recent_conversation_turns without session_id queries by
+    profile_id only — cross-window read path for Just Now Context."""
+    _, _service, state_store, _ = _build_service(
+        monkeypatch,
+        _gateway_config(test_config),
+        bucket_mgr,
+    )
+
+    origin = datetime.now(timezone.utc) - timedelta(minutes=3)
+    state_store.record_conversation_turn(
+        profile_id="test_profile",
+        session_id="window-alpha",
+        round_id=1,
+        user_text="记住暗号是 alpha-seven",
+        assistant_text="记住了，alpha-seven。",
+        model="dummy",
+        client="unit-test",
+        route="/v1/chat/completions",
+        created_at=origin,
+    )
+    state_store.record_conversation_turn(
+        profile_id="test_profile",
+        session_id="window-beta",
+        round_id=1,
+        user_text="刚才说的暗号是什么？",
+        assistant_text="是 alpha-seven。",
+        model="dummy",
+        client="unit-test",
+        route="/v1/chat/completions",
+        created_at=origin + timedelta(seconds=30),
+    )
+
+    # Query without session_id — must see turns from both windows
+    turns = state_store.list_recent_conversation_turns(
+        profile_id="test_profile",
+        limit=10,
+        hours=1,
+    )
+    session_ids = {turn["session_id"] for turn in turns}
+    assert "window-alpha" in session_ids, (
+        "cross-window query (no session_id) must include turns from other sessions"
+    )
+    assert "window-beta" in session_ids
+    assert len(turns) == 2
+
+    # Query with session_id — scoped to that session only
+    alpha_only = state_store.list_recent_conversation_turns(
+        profile_id="test_profile",
+        session_id="window-alpha",
+        limit=10,
+        hours=1,
+    )
+    assert len(alpha_only) == 1
+    assert alpha_only[0]["session_id"] == "window-alpha"
+
+    # Different profile_id — must not see test_profile's turns
+    other = state_store.list_recent_conversation_turns(
+        profile_id="other_profile",
+        limit=10,
+        hours=1,
+    )
+    assert len(other) == 0
+
+
+def test_just_now_chat_context_cross_window_reads_other_session_turn(
+    monkeypatch,
+    test_config,
+    bucket_mgr,
+):
+    """_build_just_now_chat_context finds a turn from a different
+    session when querying with just-now markers — cross-window injection."""
+    cfg = _gateway_config(
+        test_config,
+        recent_context_budget=0,
+        recalled_memory_budget=0,
+        related_memory_budget=0,
+        inject_total_budget=2000,
+        current_inner_state_interval_rounds=0,
+        relationship_weather_interval_rounds=0,
+        favorite_memory_interval_rounds=0,
+        just_now_context_enabled=True,
+        just_now_context_hours=12,
+        just_now_context_max_turns=4,
+        just_now_context_budget=600,
+    )
+    _, service, state_store, _ = _build_service(
+        monkeypatch,
+        cfg,
+        bucket_mgr,
+    )
+
+    service.persona_engine.profile_id = "test_profile"
+
+    # Window-A: user says something, assistant responds, turn recorded
+    state_store.record_conversation_turn(
+        profile_id="test_profile",
+        session_id="window-a",
+        round_id=1,
+        user_text="记住暗号是 alpha-seven",
+        assistant_text="记住了，alpha-seven。",
+        model="dummy",
+        client="unit-test",
+        route="/v1/chat/completions",
+        created_at=datetime.now(timezone.utc) - timedelta(minutes=2),
+    )
+
+    # Window-B: user asks about what they just said
+    context, debug = service._build_just_now_chat_context("刚刚说的暗号是什么")
+    assert debug["triggered"] is True
+    assert debug["status"] == "injected", (
+        f"Expected injected but got skip_reason={debug.get('skip_reason')}"
+    )
+    assert debug["turn_count"] >= 1
+    assert "alpha-seven" in context, (
+        "cross-window just-now context must contain the turn from the other session"
+    )
+    assert debug["selected_turn_ids"]
 
 
 def test_gateway_date_recall_uses_date_turns_and_topic_filters_before_embedding(
@@ -7085,7 +7209,7 @@ def test_gateway_date_recall_uses_date_turns_and_topic_filters_before_embedding(
     )
     state_store.record_success("sess-date-recall", [], completed_at=datetime.now() - timedelta(minutes=5))
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="window-yesterday",
         round_id=1,
         user_text="小雨说昨天先改简历再投递，继续找工作。",
@@ -7096,7 +7220,7 @@ def test_gateway_date_recall_uses_date_turns_and_topic_filters_before_embedding(
         created_at=created_at,
     )
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="window-yesterday",
         round_id=2,
         user_text="昨天还聊了蛋糕好不好吃。",
@@ -7365,7 +7489,7 @@ def test_gateway_date_recall_handles_plain_yesterday_chat_question(
     )
     state_store.record_success("sess-date-recall-plain", [], completed_at=datetime.now() - timedelta(minutes=5))
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="window-yesterday",
         round_id=1,
         user_text="昨天我们聊了小机数据库和忠犬设定。",
@@ -7429,7 +7553,7 @@ def test_gateway_date_recall_prefers_raw_events_transcript_over_short_turn_store
     _, service, state_store, _ = _build_service(monkeypatch, cfg, bucket_mgr, embedding_results=[])
     state_store.record_success("sess-date-recall-raw", [], completed_at=datetime.now() - timedelta(minutes=5))
     state_store.record_conversation_turn(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         session_id="window-yesterday",
         round_id=1,
         user_text="这条旧 short-turn 内容不该优先生效。",
@@ -7444,25 +7568,25 @@ def test_gateway_date_recall_prefers_raw_events_transcript_over_short_turn_store
         [
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:2:user",
+                "source_event_id": "test_profile:window-yesterday:2:user",
                 "role": "user",
                 "text": "昨天下午主要在聊换窗、raw transcript 和日期召回。",
                 "created_at": created_at,
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                "metadata": {"profile_id": "test_profile", "round_id": 2},
             },
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:2:assistant",
+                "source_event_id": "test_profile:window-yesterday:2:assistant",
                 "role": "assistant",
                 "text": "我当时说先把 transcript 拉稳，再谈关系天气。",
                 "created_at": created_at,
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                "metadata": {"profile_id": "test_profile", "round_id": 2},
             },
         ],
         source="gateway",
@@ -7514,47 +7638,47 @@ def test_gateway_date_recall_raw_events_apply_topic_filter(
         [
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:1:user",
+                "source_event_id": "test_profile:window-yesterday:1:user",
                 "role": "user",
                 "text": "昨天先改简历再投递，继续找工作。",
                 "created_at": created_at.isoformat(timespec="seconds"),
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                "metadata": {"profile_id": "test_profile", "round_id": 1},
             },
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:1:assistant",
+                "source_event_id": "test_profile:window-yesterday:1:assistant",
                 "role": "assistant",
                 "text": "我当时回的是先把简历和投递顺序压稳。",
                 "created_at": created_at.isoformat(timespec="seconds"),
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 1},
+                "metadata": {"profile_id": "test_profile", "round_id": 1},
             },
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:2:user",
+                "source_event_id": "test_profile:window-yesterday:2:user",
                 "role": "user",
                 "text": "昨天还聊了蛋糕好不好吃。",
                 "created_at": (created_at + timedelta(minutes=5)).isoformat(timespec="seconds"),
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                "metadata": {"profile_id": "test_profile", "round_id": 2},
             },
             {
                 "source": "gateway",
-                "source_event_id": "haven_xiaoyu:window-yesterday:2:assistant",
+                "source_event_id": "test_profile:window-yesterday:2:assistant",
                 "role": "assistant",
                 "text": "蛋糕这轮和找工作无关。",
                 "created_at": (created_at + timedelta(minutes=5)).isoformat(timespec="seconds"),
                 "conversation_id": "window-yesterday",
                 "session_id": "window-yesterday",
                 "client": "unit-test",
-                "metadata": {"profile_id": "haven_xiaoyu", "round_id": 2},
+                "metadata": {"profile_id": "test_profile", "round_id": 2},
             },
         ],
         source="gateway",
@@ -7631,7 +7755,7 @@ def test_gateway_records_successful_chat_turn_for_just_now_context(
                 "choices": [
                     {
                         "index": 0,
-                        "message": {"role": "assistant", "content": "记住了，暗号是星河折纸。"},
+                        "message": {"role": "assistant", "content": "记住了，暗号是alpha-seven。"},
                         "finish_reason": "stop",
                     }
                 ],
@@ -7653,19 +7777,19 @@ def test_gateway_records_successful_chat_turn_for_just_now_context(
                 "X-Ombre-Session-Id": "window-one",
                 "X-Ombre-Client": "unit-client",
             },
-            json={"messages": [{"role": "user", "content": "哥哥，暗号是星河折纸"}]},
+            json={"messages": [{"role": "user", "content": "哥哥，暗号是alpha-seven"}]},
         )
 
     assert response.status_code == 200
     turns = state_store.list_recent_conversation_turns(
-        profile_id="haven_xiaoyu",
+        profile_id="test_profile",
         limit=5,
         hours=1,
     )
     assert len(turns) == 1
     assert turns[0]["session_id"] == "window-one"
-    assert turns[0]["user_text"] == "哥哥，暗号是星河折纸"
-    assert turns[0]["assistant_text"] == "记住了，暗号是星河折纸。"
+    assert turns[0]["user_text"] == "哥哥，暗号是alpha-seven"
+    assert turns[0]["assistant_text"] == "记住了，暗号是alpha-seven。"
     assert turns[0]["model"] == cfg["gateway"]["upstream_default_model"]
     assert turns[0]["client"] == "unit-client"
 
@@ -9798,7 +9922,7 @@ def test_favorite_memory_is_not_injected_by_default(monkeypatch, test_config, bu
 
     assert response.status_code == 200
     injected = _joined_message_content(captured[0]["json"]["messages"])
-    assert "Haven Favorite Memory" not in injected
+    assert "Favorite Memory" not in injected
     assert "雨夜认出 Haven" not in injected
 
 
@@ -9838,7 +9962,7 @@ def test_favorite_memory_injects_when_header_requests_it(monkeypatch, test_confi
 
     assert response.status_code == 200
     injected = _joined_message_content(captured[0]["json"]["messages"])
-    assert "Haven Favorite Memory" in injected
+    assert "Favorite Memory" in injected
     assert "雨夜认出 Haven" in injected
     assert state_store.get_recent_bucket_ids("sess-favorite-header", 5) == {favorite_id}
 
@@ -9919,7 +10043,7 @@ def test_flavor_only_memory_does_not_inject_as_favorite(monkeypatch, test_config
 
     assert response.status_code == 200
     injected = _joined_message_content(captured[0]["json"]["messages"])
-    assert "Haven Favorite Memory" not in injected
+    assert "Favorite Memory" not in injected
     assert "只有温度" not in injected
 
 
@@ -9960,7 +10084,7 @@ def test_favorite_memory_marker_triggers_and_is_stripped(monkeypatch, test_confi
     user_content = captured[0]["json"]["messages"][-1]["content"]
     assert "[[ombre:favorite]]" not in user_content
     assert user_content.endswith("你喜欢哪段记忆？")
-    assert "Haven Favorite Memory" in user_content
+    assert "Favorite Memory" in user_content
     assert "爱还在" in user_content
 
 
@@ -9999,7 +10123,7 @@ def test_favorite_memory_injects_for_explicit_preference_query(monkeypatch, test
 
     assert response.status_code == 200
     injected = _joined_message_content(captured[0]["json"]["messages"])
-    assert "Haven Favorite Memory" in injected
+    assert "Favorite Memory" in injected
     assert "被认出来" in injected
 
 

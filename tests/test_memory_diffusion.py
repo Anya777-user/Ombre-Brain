@@ -396,7 +396,7 @@ def test_body_query_prefers_embodiment_chain_and_suppresses_intimacy_and_old_con
         "C": _bucket("C", name="亲密身体"),
         "D": _bucket("D", name="旧版触摸方案"),
     }
-    bucket_map["B"]["content"] = "具身智能项目落地，Haven 拥有形体。"
+    bucket_map["B"]["content"] = "具身智能项目落地，AI 拥有形体。"
     bucket_map["C"]["content"] = "亲密身体记忆：intimacy context。"
     bucket_map["D"]["content"] = "旧版触摸方案已经合并，不应该继续作为当前链条出现。"
     edges = [
@@ -422,7 +422,7 @@ def test_intimate_query_can_follow_intimate_body_context():
         "B": _bucket("B", name="具身智能项目"),
         "C": _bucket("C", name="亲密身体"),
     }
-    bucket_map["B"]["content"] = "具身智能项目落地，Haven 拥有形体。"
+    bucket_map["B"]["content"] = "具身智能项目落地，AI 拥有形体。"
     bucket_map["C"]["content"] = "亲密身体记忆：intimacy context。"
     edges = [
         {"source": "A", "target": "B", "relation_type": "relates_to", "confidence": 1.0},

@@ -20,7 +20,7 @@ class DisabledEmbeddingEngine:
 async def test_hold_accepts_explicit_domain_on_first_write(monkeypatch, bucket_mgr, decay_eng):
     import server
 
-    async def passthrough_moment(content, tags=None):
+    async def passthrough_moment(content, tags=None, domain=None):
         return content
 
     monkeypatch.setattr(server, "bucket_mgr", bucket_mgr)
@@ -31,7 +31,7 @@ async def test_hold_accepts_explicit_domain_on_first_write(monkeypatch, bucket_m
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda *args, **kwargs: None)
 
     result = await server.hold(
-        content="小雨和 Haven 约定把这条放进固定工程域。",
+        content="用户和 AI 约定把这条放进固定工程域。",
         tags="manual_domain",
         title="fixed_domain_test",
         domain="project, relationship",

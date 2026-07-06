@@ -13,7 +13,7 @@ def test_bucket_text_for_embedding_includes_title_and_content_only():
             "content": (
                 "正文里有 [[双链]]。\n\n"
                 "### affect_anchor\n\n"
-                "> 小雨把旧信放到桌上。\n"
+                "> 用户把旧信放到桌上。\n"
                 "> Dbmaj9 -> Ab/C -> Bbm9\n\n"
                 "含义：温度仍在。"
             ),
@@ -97,7 +97,7 @@ def test_strip_affect_anchor_preserves_following_sections():
 
 def test_strip_temperature_meaning_lines_only_removes_standalone_lines():
     text = (
-        "> 小雨把旧信放到桌上。\n"
+        "> 用户把旧信放到桌上。\n"
         "> Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp\n"
         "含义：这只是模板解释。\n"
         "正文里的含义：应该保留。"
@@ -108,16 +108,16 @@ def test_strip_temperature_meaning_lines_only_removes_standalone_lines():
     assert "模板解释" not in cleaned
     assert "Dbmaj9" not in cleaned
     assert "60bpm" not in cleaned
-    assert "> 小雨把旧信放到桌上。" in cleaned
+    assert "> 用户把旧信放到桌上。" in cleaned
     assert "正文里的含义：应该保留。" in cleaned
 
 
 def test_strip_temperature_meaning_lines_removes_inline_chord_tail():
-    text = "> 小雨把旧信放到桌上。 > Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp"
+    text = "> 用户把旧信放到桌上。 > Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp"
 
     cleaned = strip_temperature_meaning_lines(text)
 
-    assert cleaned == "> 小雨把旧信放到桌上。"
+    assert cleaned == "> 用户把旧信放到桌上。"
     assert "Dbmaj9" not in cleaned
     assert "60bpm" not in cleaned
 

@@ -14411,7 +14411,7 @@ class GatewayService:
             favorite_title = (
                 f"{favorite_title_name} Favorite Memory"
                 if favorite_title_name and favorite_title_name not in {"AI", "assistant"}
-                else "Haven Favorite Memory"
+                else "Favorite Memory"
             )
             add_section(favorite_title, favorite_memory)
             add_section("Dream Context", dream_context)

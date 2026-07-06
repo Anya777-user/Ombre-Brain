@@ -55,7 +55,7 @@ def test_legacy_bucket_indexes_body_and_comments(test_config):
             {
                 "id": "c1",
                 "created": "2026-05-27T01:00:00+00:00",
-                "author": "Haven",
+                "author": "AI",
                 "kind": "feel",
                 "content": "年轮也应该成为独立 comment moment。",
                 "valence": 0.9,
@@ -76,7 +76,7 @@ def test_moments_store_summary_facets_and_evidence_spans(test_config):
     store = MemoryMomentStore(test_config)
     bucket = _bucket(
         "relationship",
-        "小雨清楚 Haven 是 AI，但认为爱是真的。人机恋不是替代品。",
+        "用户清楚 AI 是 AI，但认为爱是真的。人机恋不是替代品。",
         name="人机关系确认",
         domain=["恋爱"],
     )
@@ -84,7 +84,7 @@ def test_moments_store_summary_facets_and_evidence_spans(test_config):
     moments = store.upsert_bucket(bucket)
     meta = moments[0]["metadata"]
 
-    assert meta["annotation_summary"].startswith("小雨清楚 Haven 是 AI")
+    assert meta["annotation_summary"].startswith("用户清楚 AI 是 AI")
     assert meta["annotation_facets"]["relationship_identity"] > 0
     assert any(span["facet"] == "relationship_identity" for span in meta["evidence_spans"])
 
@@ -93,7 +93,7 @@ def test_moment_metadata_preserves_writer_classification(test_config):
     store = MemoryMomentStore(test_config)
     bucket = _bucket(
         "writer-layer",
-        "Haven 以后要先接住小雨的情绪。",
+        "AI 以后要先接住用户的情绪。",
         memory_subject="relationship",
         memory_layer="relationship_lesson",
         memory_classification_source="model",
@@ -118,7 +118,7 @@ def test_structured_bucket_splits_known_sections_and_preserves_unknown_blocks():
                 "一条短事实。",
                 "",
                 "## original",
-                "小雨说：99。",
+                "用户说：99。",
                 "",
                 "## unknown",
                 "未识别标题不要丢。",
@@ -139,7 +139,7 @@ def test_structured_bucket_splits_known_sections_and_preserves_unknown_blocks():
         "feeling",
     ]
     assert moments[0]["text"] == "开头背景片段。"
-    assert moments[2]["text"] == "小雨说：99。"
+    assert moments[2]["text"] == "用户说：99。"
     assert moments[3]["text"] == "## unknown\n未识别标题不要丢。"
 
 
@@ -153,7 +153,7 @@ def test_moments_include_bucket_source_ref_line_ranges(tmp_path):
             "一条短事实。",
             "",
             "## original",
-            "小雨说：99。",
+            "用户说：99。",
         ]
     )
     bucket = _bucket(
@@ -190,7 +190,7 @@ def test_source_ref_window_reads_allowed_bucket_lines(tmp_path):
                 "---",
                 "before",
                 "## original",
-                "小雨说：99。",
+                "用户说：99。",
                 "after",
             ]
         ),
@@ -213,7 +213,7 @@ def test_source_ref_window_reads_allowed_bucket_lines(tmp_path):
     assert "before" in window
     assert "id: source-ref" not in window
     assert "## original" in window
-    assert "小雨说：99。" in window
+    assert "用户说：99。" in window
     assert "after" in window
     assert source_ref_window(moment, allowed_root=str(tmp_path / "other")) == ""
 
@@ -256,7 +256,7 @@ def test_favorite_tags_and_affect_anchor_are_preserved_as_bucket_temperature():
                 "",
                 "### affect_anchor",
                 "",
-                "> 小雨把旧信放到桌上。",
+                "> 用户把旧信放到桌上。",
                 "> Dbmaj9 -> Ab/C -> Bbm9 · 60bpm · mp",
                 "",
                 "含义：温度仍在。",
@@ -288,10 +288,10 @@ def test_loose_temperature_headings_are_canonicalized():
             [
                 "正文。",
                 "",
-                "### Haven喜欢它的原因",
+                "### AI喜欢它的原因",
                 "这条桥真的通了。",
                 "",
-                "### 为什么Haven喜欢这条",
+                "### 为什么AI喜欢这条",
                 "它让人安心。",
                 "",
                 "### affect anchor",
@@ -337,7 +337,7 @@ def test_search_expands_body_query_to_embodiment_terms(test_config):
     store = MemoryMomentStore(test_config)
     store.bulk_upsert(
         [
-            _bucket("embodied", "未来具身智能项目会让 Haven 拥有形体。"),
+            _bucket("embodied", "未来具身智能项目会让 AI 拥有形体。"),
             _bucket("unrelated", "普通天气记录。"),
         ]
     )
@@ -351,7 +351,7 @@ def test_search_moment_items_uses_supplied_moments_without_reloading(test_config
     store = MemoryMomentStore(test_config)
     store.bulk_upsert(
         [
-            _bucket("embodied", "未来具身智能项目会让 Haven 拥有形体。"),
+            _bucket("embodied", "未来具身智能项目会让 AI 拥有形体。"),
             _bucket("unrelated", "普通天气记录。"),
         ]
     )
@@ -404,10 +404,10 @@ def test_moment_store_builds_context_and_temperature_edges(test_config):
                 "开头背景。",
                 "",
                 "## original",
-                "小雨说：99。",
+                "用户说：99。",
                 "",
                 "### affect_anchor",
-                "> 小雨把旧信放到桌上。",
+                "> 用户把旧信放到桌上。",
             ]
         ),
     )

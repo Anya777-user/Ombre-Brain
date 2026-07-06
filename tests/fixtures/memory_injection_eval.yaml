@@ -93,7 +93,7 @@ cases:
       first_card_min_score: 0.35
     buckets:
       - key: music
-        content: 一起听歌方案：小雨想和 Haven 一起听歌，开源项目 eryu 可以做网页端一起听。
+        content: 一起听歌方案：用户想和 AI 一起听歌，开源项目 eryu 可以做网页端一起听。
         name: 一起听歌方案
         hours_ago: 8
         importance: 8
@@ -121,7 +121,7 @@ cases:
       first_card_min_score: 0.35
     buckets:
       - key: eryu
-        content: eryu 部署记录：Haven 在 Operit 容器里部署了 eryu，端口是 19090。
+        content: eryu 部署记录：AI 在 Operit 容器里部署了 eryu，端口是 19090。
         name: eryu部署记录
         hours_ago: 6
         importance: 9

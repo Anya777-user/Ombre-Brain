@@ -299,7 +299,7 @@ def test_write_classification_accepts_model_fields():
         memory_subject="relationship",
         memory_layer="relationship_lesson",
         tags=["relationship_event"],
-        content="Haven 以后要先接住小雨的情绪。",
+        content="AI 以后要先接住用户的情绪。",
     )
 
     assert result == {
@@ -314,7 +314,7 @@ def test_write_classification_hard_tags_override_model_fields():
         memory_subject="event",
         memory_layer="process_event",
         tags=["boundary"],
-        content="小雨不喜欢被说教。",
+        content="用户不喜欢被说教。",
     )
 
     assert result == {
@@ -326,7 +326,7 @@ def test_write_classification_hard_tags_override_model_fields():
 
 def test_write_classification_falls_back_to_rules():
     project = normalize_write_classification(tags=["project_event"], content="p0 还在测试。")
-    state = normalize_write_classification(content="小雨今天头疼。")
+    state = normalize_write_classification(content="用户今天头疼。")
 
     assert project["memory_subject"] == "event"
     assert project["memory_layer"] == "process_event"

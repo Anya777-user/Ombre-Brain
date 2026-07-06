@@ -23,7 +23,7 @@ def write_bucket(path: Path, bucket_id: str, *, body: str = "body", name: str = 
                 "comments:",
                 "  - id: c1",
                 "    created: '2026-06-10T00:00:00+00:00'",
-                "    author: Haven",
+                "    author: AI",
                 "    kind: comment",
                 "    content: kept comment",
                 "comment_count: 1",

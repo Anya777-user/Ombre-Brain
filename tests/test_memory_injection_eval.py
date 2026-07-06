@@ -44,7 +44,7 @@ class DummyEmbeddingEngine:
 
 class DummyPersonaEngine:
     enabled = True
-    profile_id = "haven_xiaoyu"
+    profile_id = "test_profile"
     mode = "test"
     model = "dummy"
     api_key = ""

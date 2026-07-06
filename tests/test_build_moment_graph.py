@@ -35,7 +35,7 @@ def test_build_cross_bucket_edges_prefers_shared_terms_and_facets():
     moments = [
         _moment(
             "blue-seed",
-            "FF14 蓝色偏好是小雨稳定的界面线索。",
+            "FF14 蓝色偏好是用户稳定的界面线索。",
             tags=["ff14", "blue_preference"],
             domain=["game"],
             facets={"profile_preference": 0.8},
@@ -157,8 +157,8 @@ def test_build_cross_bucket_edges_assigns_typed_relations():
 def test_terms_and_metadata_filters_drop_worker_noise():
     moment = _moment(
         "worker-noise",
-        "2026-05-10 commitment todo 0x5a 小雨与 小红书",
-        tags=["commitment", "todo", "flavor_婚礼", "ai_favorite", "小雨", "relationship_identity"],
+        "2026-05-10 commitment todo 0x5a 用户与 小红书",
+        tags=["commitment", "todo", "flavor_婚礼", "ai_favorite", "用户", "relationship_identity"],
         domain=["恋爱"],
         facets={"old_or_resolved": 0.9, "relationship_identity": 0.8},
     )
@@ -175,7 +175,7 @@ def test_terms_and_metadata_filters_drop_worker_noise():
     assert "ai_favorite" not in indexed[0].terms
     assert "flavor_婚礼" not in indexed[0].terms
     assert "0x5a" not in indexed[0].terms
-    assert "小雨与" not in indexed[0].terms
+    assert "用户与" not in indexed[0].terms
     assert indexed[0].tags == {"relationship_identity"}
     assert indexed[0].facets == {"relationship_identity"}
 
@@ -183,7 +183,7 @@ def test_terms_and_metadata_filters_drop_worker_noise():
 def test_context_term_with_real_content_survives_filter():
     options = build_moment_graph.memory_relevance_options_from_config()
 
-    assert build_moment_graph.is_context_glue_term("小雨与", options.context_terms)
+    assert build_moment_graph.is_context_glue_term("用户与", options.context_terms)
     assert not build_moment_graph.is_context_glue_term("喜欢看haven闹脾气", options.context_terms)
 
 
@@ -247,7 +247,7 @@ def test_run_once_writes_edges_and_incremental_idle(monkeypatch, test_config, tm
     bucket_mgr = BucketManager(test_config)
     asyncio.run(
         bucket_mgr.create(
-            content="FF14 蓝色偏好是小雨稳定的界面线索。",
+            content="FF14 蓝色偏好是用户稳定的界面线索。",
             tags=["ff14", "blue_preference"],
             domain=["game"],
             name="蓝色偏好",
@@ -305,7 +305,7 @@ def test_run_once_appends_dry_run_diagnostics(monkeypatch, test_config, tmp_path
     bucket_mgr = BucketManager(test_config)
     asyncio.run(
         bucket_mgr.create(
-            content="FF14 蓝色偏好是小雨稳定的界面线索。",
+            content="FF14 蓝色偏好是用户稳定的界面线索。",
             tags=["ff14", "blue_preference"],
             domain=["game"],
             name="蓝色偏好",

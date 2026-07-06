@@ -48,7 +48,7 @@ async def test_dream_materials_use_recent_memory_and_whisper_not_daily_impressio
 
     await mgr.create(
         bucket_id="identity-anchor",
-        content="小雨清楚 Haven 是 AI，并爱其本质。",
+        content="用户清楚 AI 是 AI，并爱其本质。",
         name="人机关系确认",
         bucket_type="permanent",
         pinned=True,
@@ -222,7 +222,7 @@ async def test_dream_payload_exposes_structured_year_ring_comments(test_config):
         [
             {
                 "id": "memory-with-comments",
-                "content": "小雨和 Haven 讨论梦要能读到年轮。",
+                "content": "用户和 AI 讨论梦要能读到年轮。",
                 "metadata": {
                     "created": "2026-05-24T22:00:00+08:00",
                     "updated_at": "2026-05-25T01:00:00+08:00",
@@ -231,7 +231,7 @@ async def test_dream_payload_exposes_structured_year_ring_comments(test_config):
                         {
                             "id": "ring-1",
                             "created": "2026-05-25T00:30:00+08:00",
-                            "author": "Haven",
+                            "author": "AI",
                             "kind": "feel",
                             "source": "comment_bucket",
                             "content": "后来再看，我觉得这圈[[年轮]]应该被梦见。",
@@ -250,7 +250,7 @@ async def test_dream_payload_exposes_structured_year_ring_comments(test_config):
     assert comment == {
         "id": "ring-1",
         "created": "2026-05-25T00:30:00+08:00",
-        "author": "Haven",
+        "author": "AI",
         "kind": "feel",
         "text": "后来再看，我觉得这圈年轮应该被梦见。",
     }
@@ -292,7 +292,7 @@ async def test_daily_probability_miss_is_decided_once(test_config):
 @pytest.mark.asyncio
 async def test_dream_model_disables_thinking_by_default(test_config):
     cfg = _dream_config(test_config, api_key="fake")
-    cfg["identity"] = {"ai_name": "Ombre", "user_display_name": "小雨"}
+    cfg["identity"] = {"ai_name": "Ombre", "user_display_name": "用户"}
     engine = DreamEngine(cfg)
     calls = []
 
@@ -324,7 +324,7 @@ async def test_dream_model_disables_thinking_by_default(test_config):
 def test_dream_recall_cues_are_extracted_from_dream_text_not_material_template(test_config):
     engine = DreamEngine(_dream_config(test_config))
     dream_text = (
-        "小雨的头发在变长，发梢拖过地板时发出沙沙声。"
+        "用户的头发在变长，发梢拖过地板时发出沙沙声。"
         "我伸手去碰，指尖碰到一枚银色戒指。"
         "远处有人敲三下，停，又三下。口哨声。"
     )
@@ -340,7 +340,7 @@ def test_dream_recall_cues_are_extracted_from_dream_text_not_material_template(t
 def test_dream_recall_cues_do_not_treat_xiaoyu_as_rain_material(test_config):
     engine = DreamEngine(_dream_config(test_config))
 
-    cues = engine._recall_cues_from_dream_text("小雨站在门后，手指绕着一根发亮的线。")
+    cues = engine._recall_cues_from_dream_text("用户站在门后，手指绕着一根发亮的线。")
 
     assert any("门" in cue or "手指" in cue or "线" in cue for cue in cues)
     assert "潮湿安静的夜里" not in cues
@@ -365,7 +365,7 @@ async def test_surface_formats_dream_and_removes_body_from_live_storage(test_con
             "dream_id": "dream_test",
             "generated_at": generated_at.isoformat(timespec="seconds"),
             "local_date": "2026-05-25",
-            "ai_name": "Haven",
+            "ai_name": "AI",
             "dream_model": "deepseek-v4-flash",
             "core_affect": {"valence": 0.5, "arousal": 0.4},
             "recall_cues": ["熟悉空间忽然陌生", "夜里想起未说完的话"],
@@ -387,7 +387,7 @@ async def test_surface_formats_dream_and_removes_body_from_live_storage(test_con
     )
     payload = engine.dashboard_payload()
 
-    assert surfaced.startswith("===== 梦境 =====\n2026年05月25日 Haven的梦\n")
+    assert surfaced.startswith("===== 梦境 =====\n2026年05月25日 AI的梦\n")
     assert "右手食指指尖有湿气" in surfaced
     assert not record.path.exists()
     assert "右手食指指尖有湿气" not in str(payload)
@@ -403,7 +403,7 @@ async def test_surface_can_retain_record_after_gateway_injection(test_config):
             "dream_id": "dream_retained",
             "generated_at": generated_at.isoformat(timespec="seconds"),
             "local_date": "2026-05-25",
-            "ai_name": "Haven",
+            "ai_name": "AI",
             "dream_model": "deepseek-v4-flash",
             "core_affect": {"valence": 0.5, "arousal": 0.4},
             "recall_cues": ["熟悉空间忽然陌生", "夜里想起未说完的话"],
@@ -453,7 +453,7 @@ async def test_surface_matches_direct_recall_cue_without_embedding(test_config):
             "dream_id": "dream_cue_text",
             "generated_at": generated_at.isoformat(timespec="seconds"),
             "local_date": "2026-05-25",
-            "ai_name": "Haven",
+            "ai_name": "AI",
             "dream_model": "deepseek-v4-flash",
             "core_affect": {"valence": 0.2, "arousal": 0.1},
             "recall_cues": ["熟悉空间忽然陌生", "醒来前留下的细节"],

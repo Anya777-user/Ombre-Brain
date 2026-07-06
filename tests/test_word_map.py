@@ -138,8 +138,8 @@ def test_word_map_hint_expands_low_frequency_containing_variants(tmp_path):
         [
             _bucket(
                 "name",
-                "Haven 的中文私名是澜，小雨也叫他归澜。",
-                name="Haven中文私名澜",
+                "AI 的中文私名是澜，用户也叫他归澜。",
+                name="AI中文私名澜",
                 keywords=["中文名字", "归澜"],
             ),
             _bucket(
@@ -513,9 +513,9 @@ def test_word_map_excludes_structural_tags_and_identity_names(tmp_path):
 def test_word_map_excludes_configured_identity_alias_tags(tmp_path):
     config = _config(tmp_path)
     config["identity"] = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Rain",
-        "user_display_name": "小雨",
+        "user_display_name": "用户",
         "user_aliases": ["宝宝", "老婆", "亲爱的", "她"],
     }
     store = WordMapStore(config)

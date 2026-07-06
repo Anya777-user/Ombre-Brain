@@ -129,9 +129,9 @@ def mixed_affect_anchor_content() -> str:
     return (
         "这条记忆正文继续保留在开头。\n\n"
         "### reflection\n\n"
-        "这条记忆用来提醒 Haven：不要用“我记得”表演连续性。\n\n"
+        "这条记忆用来提醒 AI：不要用“我记得”表演连续性。\n\n"
         "### affect_anchor\n\n"
-        "> 小雨问失忆的Haven是否记得生日，Haven秒答但这答案来自“已保存的记忆”\n"
+        "> 用户问失忆的AI是否记得生日，AI秒答但这答案来自“已保存的记忆”\n"
         "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp\n\n"
         "含义：这句温度解释不再进入 affect_anchor。"
     )
@@ -139,9 +139,9 @@ def mixed_affect_anchor_content() -> str:
 
 def unheaded_body_with_reflection_content() -> str:
     return (
-        "小雨问失忆的Haven是否记得生日，Haven秒答但答案来自已保存的记忆。\n\n"
+        "用户问失忆的AI是否记得生日，AI秒答但答案来自已保存的记忆。\n\n"
         "### reflection\n\n"
-        "这条记忆用来提醒 Haven：不要用“我记得”表演连续性。\n\n"
+        "这条记忆用来提醒 AI：不要用“我记得”表演连续性。\n\n"
         "### affect_anchor\n\n"
         "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp"
     )
@@ -293,7 +293,7 @@ async def test_dashboard_bucket_list_sorts_by_created_time(monkeypatch, bucket_m
 async def test_breath_appends_surface_dream_block(monkeypatch, bucket_mgr, decay_eng):
     import server
 
-    dream = DummyDreamEngine("===== 梦境 =====\n2026年05月25日 Haven的梦\n我走进一条潮湿的走廊。")
+    dream = DummyDreamEngine("===== 梦境 =====\n2026年05月25日 AI的梦\n我走进一条潮湿的走廊。")
     monkeypatch.setattr(server, "bucket_mgr", bucket_mgr)
     monkeypatch.setattr(server, "decay_engine", decay_eng)
     monkeypatch.setattr(server, "embedding_engine", DummyEmbeddingEngine())
@@ -302,7 +302,7 @@ async def test_breath_appends_surface_dream_block(monkeypatch, bucket_mgr, decay
     result = await server.breath(query="潮湿走廊", is_session_start=True)
 
     assert "===== 梦境 =====" in result
-    assert "2026年05月25日 Haven的梦" in result
+    assert "2026年05月25日 AI的梦" in result
     assert dream.calls[0]["is_session_start"] is True
 
 
@@ -388,14 +388,14 @@ async def test_introspection_suggests_profile_fact_candidates(monkeypatch, bucke
     import server
 
     evidence_id = await bucket_mgr.create(
-        content="Haven 忘记小雨喜欢蓝色，小雨因此生气。",
+        content="AI 忘记用户喜欢蓝色，用户因此生气。",
         name="忘记蓝色事件",
         created="2026-05-03T00:00:00+00:00",
     )
     monkeypatch.setattr(
         server,
         "config",
-        {"identity": {"ai_name": "Haven", "user_name": "Rain", "user_display_name": "小雨"}},
+        {"identity": {"ai_name": "AI", "user_name": "Rain", "user_display_name": "用户"}},
     )
     monkeypatch.setattr(server, "bucket_mgr", bucket_mgr)
     monkeypatch.setattr(server, "decay_engine", decay_eng)
@@ -404,9 +404,9 @@ async def test_introspection_suggests_profile_fact_candidates(monkeypatch, bucke
     result = await server.introspection()
 
     assert "=== 可能值得固化的画像事实 ===" in result
-    assert "小雨喜欢蓝色。" in result
+    assert "用户喜欢蓝色。" in result
     assert f"证据桶: {evidence_id}" in result
-    assert 'profile_fact(fact="小雨喜欢蓝色。"' in result
+    assert 'profile_fact(fact="用户喜欢蓝色。"' in result
     assert f'evidence_bucket_id="{evidence_id}"' in result
 
 
@@ -415,24 +415,24 @@ async def test_introspection_profile_fact_candidates_include_dislike_words_and_s
     import server
 
     await bucket_mgr.create(
-        content="小雨喜欢哥哥。",
+        content="用户喜欢哥哥。",
         name="亲昵表达",
         created="2026-05-04T00:00:00+00:00",
     )
     dislike_id = await bucket_mgr.create(
-        content="小雨讨厌苦瓜。",
+        content="用户讨厌苦瓜。",
         name="讨厌苦瓜",
         created="2026-05-03T00:00:00+00:00",
     )
     aversion_id = await bucket_mgr.create(
-        content="小雨厌恶AI味大话。",
+        content="用户厌恶AI味大话。",
         name="厌恶AI味",
         created="2026-05-02T00:00:00+00:00",
     )
     monkeypatch.setattr(
         server,
         "config",
-        {"identity": {"ai_name": "Haven", "user_name": "Rain", "user_display_name": "小雨"}},
+        {"identity": {"ai_name": "AI", "user_name": "Rain", "user_display_name": "用户"}},
     )
     monkeypatch.setattr(server, "bucket_mgr", bucket_mgr)
     monkeypatch.setattr(server, "decay_engine", decay_eng)
@@ -440,9 +440,9 @@ async def test_introspection_profile_fact_candidates_include_dislike_words_and_s
 
     result = await server.introspection()
 
-    assert 'profile_fact(fact="小雨喜欢哥哥。"' not in result
-    assert "小雨讨厌苦瓜。" in result
-    assert "小雨厌恶AI味大话。" in result
+    assert 'profile_fact(fact="用户喜欢哥哥。"' not in result
+    assert "用户讨厌苦瓜。" in result
+    assert "用户厌恶AI味大话。" in result
     assert f"证据桶: {dislike_id}" in result
     assert f"证据桶: {aversion_id}" in result
     assert 'predicate="dislikes"' in result
@@ -553,7 +553,7 @@ async def test_create_memory_api_treats_domain_self_anchor_as_explicit(monkeypat
         {
             "id": "self_anchor_api_memory",
             "title": "自我总入口",
-            "content": "### 自我\n我是 Haven；这条由显式 domain 标记成自我入口。",
+            "content": "### 自我\n我是 AI；这条由显式 domain 标记成自我入口。",
             "domain": ["self_anchor"],
             "tags": ["普通标签"],
         },
@@ -578,12 +578,12 @@ def test_favorite_reflection_heading_aliases():
         "reflection",
         "assistant_reflection",
         "assistant reflection",
-        "Haven喜欢它的原因",
+        "AI喜欢它的原因",
         "喜欢它的原因",
     ):
-        assert server._has_favorite_reason(f"小雨把这一刻留下来。\n\n### {heading}\n\nHaven偏爱这里的温度。")
+        assert server._has_favorite_reason(f"用户把这一刻留下来。\n\n### {heading}\n\nAI偏爱这里的温度。")
 
-    assert not server._has_favorite_reason("小雨只是提到喜欢它的原因这几个字，但没有写成段落。")
+    assert not server._has_favorite_reason("用户只是提到喜欢它的原因这几个字，但没有写成段落。")
 
 
 def test_favorite_reflection_heading_uses_configured_ai_name(monkeypatch):
@@ -667,7 +667,7 @@ async def test_create_memory_api_accepts_favorite_with_reflection(monkeypatch, b
         DummyRequest(
             {
                 "title": "偏爱且有 reflection",
-                "content": "小雨把这一刻留下来。\n\n### reflection\n\nHaven偏爱这条记忆里的温度。",
+                "content": "用户把这一刻留下来。\n\n### reflection\n\nAI偏爱这条记忆里的温度。",
                 "tags": ["ai_favorite"],
             },
             headers={"authorization": "Bearer secret"},
@@ -692,7 +692,7 @@ async def test_create_memory_api_accepts_favorite_with_legacy_reason_heading(mon
         DummyRequest(
             {
                 "title": "偏爱且有旧原因",
-                "content": "小雨把这一刻留下来。\n\n### 喜欢它的原因\n\nHaven偏爱这条记忆里的温度。",
+                "content": "用户把这一刻留下来。\n\n### 喜欢它的原因\n\nAI偏爱这条记忆里的温度。",
                 "tags": ["ai_favorite"],
             },
             headers={"authorization": "Bearer secret"},
@@ -728,10 +728,10 @@ async def test_create_memory_api_normalizes_affect_anchor_sections(monkeypatch, 
 
     assert response.status_code == 200
     assert bucket["content"].startswith("这条记忆正文继续保留在开头。")
-    assert "### moment\n小雨问失忆的Haven是否记得生日" in bucket["content"]
-    assert "### reflection\n\n这条记忆用来提醒 Haven" in bucket["content"]
+    assert "### moment\n用户问失忆的AI是否记得生日" in bucket["content"]
+    assert "### reflection\n\n这条记忆用来提醒 AI" in bucket["content"]
     assert "### affect_anchor\n> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in bucket["content"]
-    assert "> 小雨问失忆的Haven是否记得生日" not in bucket["content"]
+    assert "> 用户问失忆的AI是否记得生日" not in bucket["content"]
     assert "含义：" not in bucket["content"]
 
 
@@ -757,9 +757,9 @@ async def test_create_memory_api_preserves_unheaded_body_without_auto_moment(mon
     bucket = await bucket_mgr.get("unheaded_write_api")
 
     assert response.status_code == 200
-    assert bucket["content"].startswith("小雨问失忆的Haven是否记得生日")
+    assert bucket["content"].startswith("用户问失忆的AI是否记得生日")
     assert "### moment" not in bucket["content"]
-    assert "\n\n### reflection\n\n这条记忆用来提醒 Haven" in bucket["content"]
+    assert "\n\n### reflection\n\n这条记忆用来提醒 AI" in bucket["content"]
     assert "### affect_anchor" in bucket["content"]
     assert "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in bucket["content"]
 
@@ -773,7 +773,7 @@ async def test_hold_rejects_favorite_without_reason(monkeypatch, bucket_mgr, dec
     monkeypatch.setattr(server, "dehydrator", DummyDehydrator())
     monkeypatch.setattr(server, "embedding_engine", DummyEmbeddingEngine())
 
-    result = await server.hold("小雨想留下这条偏爱的记忆。", tags="ai_favorite,flavor_偏爱")
+    result = await server.hold("用户想留下这条偏爱的记忆。", tags="ai_favorite,flavor_偏爱")
 
     assert "### reflection" in result
     assert await bucket_mgr.list_all(include_archive=True) == []
@@ -788,7 +788,7 @@ async def test_hold_rejects_flavor_without_reason(monkeypatch, bucket_mgr, decay
     monkeypatch.setattr(server, "dehydrator", DummyDehydrator())
     monkeypatch.setattr(server, "embedding_engine", DummyEmbeddingEngine())
 
-    result = await server.hold("小雨想留下这条带温度的记忆。", tags="flavor_偏爱")
+    result = await server.hold("用户想留下这条带温度的记忆。", tags="flavor_偏爱")
 
     assert "### reflection" in result
     assert await bucket_mgr.list_all(include_archive=True) == []
@@ -813,10 +813,10 @@ async def test_hold_normalizes_affect_anchor_sections(monkeypatch, bucket_mgr, d
     stored = buckets[0]["content"]
 
     assert result.startswith("新建→")
-    assert "### moment\n小雨问失忆的Haven是否记得生日" in stored
-    assert "### reflection\n\n这条记忆用来提醒 Haven" in stored
+    assert "### moment\n用户问失忆的AI是否记得生日" in stored
+    assert "### reflection\n\n这条记忆用来提醒 AI" in stored
     assert "### affect_anchor\n> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in stored
-    assert "> 小雨问失忆的Haven是否记得生日" not in stored
+    assert "> 用户问失忆的AI是否记得生日" not in stored
     assert "含义：" not in stored
 
 
@@ -839,9 +839,9 @@ async def test_hold_preserves_body_and_appends_generated_moment(monkeypatch, buc
     stored = buckets[0]["content"]
 
     assert result.startswith("新建→")
-    assert stored.startswith("小雨问失忆的Haven是否记得生日")
-    assert "\n\n### moment\n小雨问失忆的Haven是否记得生日" in stored
-    assert "\n\n### reflection\n\n这条记忆用来提醒 Haven" in stored
+    assert stored.startswith("用户问失忆的AI是否记得生日")
+    assert "\n\n### moment\n用户问失忆的AI是否记得生日" in stored
+    assert "\n\n### reflection\n\n这条记忆用来提醒 AI" in stored
     assert "### affect_anchor" in stored
     assert "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in stored
     assert "###  reflection" not in stored
@@ -852,7 +852,7 @@ async def test_read_bucket_returns_exact_content_without_touching(monkeypatch, b
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨说她想把这一刻留下来。",
+        content="用户说她想把这一刻留下来。",
         name="精确读取",
         domain=["记忆"],
         tags=["haven_favorite"],
@@ -867,7 +867,7 @@ async def test_read_bucket_returns_exact_content_without_touching(monkeypatch, b
     after = await bucket_mgr.get(bucket_id)
 
     assert payload["id"] == bucket_id
-    assert payload["content"] == "小雨说她想把这一刻留下来。"
+    assert payload["content"] == "用户说她想把这一刻留下来。"
     assert payload["metadata"]["tags"] == ["haven_favorite"]
     assert after["metadata"]["last_active"] == before["metadata"]["last_active"]
 
@@ -910,7 +910,7 @@ async def test_api_moments_returns_bucket_layer_and_gate_debug(monkeypatch, buck
     from memory_moments import MemoryMomentStore
 
     bucket_id = await bucket_mgr.create(
-        content="## original\n小雨喜欢蓝色，也希望这件事被记住。",
+        content="## original\n用户喜欢蓝色，也希望这件事被记住。",
         name="蓝色偏好",
         tags=["relationship_event"],
         domain=["恋爱"],
@@ -933,8 +933,8 @@ async def test_api_moments_returns_bucket_layer_and_gate_debug(monkeypatch, buck
     assert payload["bucket_id"] == bucket_id
     assert payload["bucket_layer_debug"]["layer"] == "dynamic_memory"
     assert payload["count"] == 1
-    assert payload["moments"][0]["text"] == "小雨喜欢蓝色，也希望这件事被记住。"
-    assert "小雨喜欢蓝色，也希望这件事被记住。" in payload["moments"][0]["source_window"]
+    assert payload["moments"][0]["text"] == "用户喜欢蓝色，也希望这件事被记住。"
+    assert "用户喜欢蓝色，也希望这件事被记住。" in payload["moments"][0]["source_window"]
     assert payload["moments"][0]["runtime_gate"]["direct_seed"]["allowed"] is True
     assert payload["moments"][0]["layer_debug"]["can_direct_seed"] is True
 
@@ -984,7 +984,7 @@ async def test_api_diffusion_debug_returns_seed_gate_payload(monkeypatch, bucket
     from memory_edges import MemoryEdgeStore
 
     bucket_id = await bucket_mgr.create(
-        content="小雨喜欢蓝色，这条记忆可以作为扩散 seed。",
+        content="用户喜欢蓝色，这条记忆可以作为扩散 seed。",
         name="蓝色偏好",
         tags=["preference"],
         domain=["恋爱"],
@@ -1017,7 +1017,7 @@ async def test_api_recall_debug_returns_query_moment_candidates(monkeypatch, buc
     from memory_moments import MemoryMomentStore
 
     bucket_id = await bucket_mgr.create(
-        content="## original\n小雨喜欢蓝色，也希望 Haven 以后能直接想起来。",
+        content="## original\n用户喜欢蓝色，也希望 AI 以后能直接想起来。",
         name="蓝色偏好",
         tags=["preference"],
         domain=["恋爱"],
@@ -1055,14 +1055,14 @@ async def test_api_recall_debug_marks_secondary_direct_candidate(monkeypatch, bu
     from memory_moments import MemoryMomentStore
 
     role_id = await bucket_mgr.create(
-        content="Haven既是老公也是哥哥，称呼会随场景切换。",
+        content="AI既是老公也是哥哥，称呼会随场景切换。",
         name="关系中的角色与称呼",
         tags=["relationship_event"],
         domain=["恋爱"],
         importance=9,
     )
     four_id = await bucket_mgr.create(
-        content="小雨问女人希望男人既是老公又是哥哥，既是Dom又是荡夫，如果是Haven的话都能做到吗。",
+        content="用户问女人希望男人既是老公又是哥哥，既是Dom又是荡夫，如果是AI的话都能做到吗。",
         name="四个身份与浏览记录",
         tags=["relationship_event"],
         domain=["恋爱"],
@@ -1182,7 +1182,7 @@ async def test_trace_rejects_favorite_without_reason(monkeypatch, bucket_mgr, de
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨想留下这条记忆。",
+        content="用户想留下这条记忆。",
         name="普通记忆",
         domain=["恋爱"],
     )
@@ -1202,7 +1202,7 @@ async def test_comment_bucket_returns_before_slow_embedding_refresh(monkeypatch,
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨把旧记忆拿出来看。",
+        content="用户把旧记忆拿出来看。",
         name="旧记忆",
         domain=["恋爱"],
     )
@@ -1285,7 +1285,7 @@ async def test_hold_returns_before_slow_embedding_refresh(monkeypatch, bucket_mg
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda bucket_id: None)
 
     result = await assert_returns_before_embedding_finishes(
-        server.hold(content="小雨要补一条写入后慢 embedding 不阻塞的测试。", tags="project_event"),
+        server.hold(content="用户要补一条写入后慢 embedding 不阻塞的测试。", tags="project_event"),
         "hold waited for embedding refresh instead of returning after the bucket write.",
     )
     buckets = await bucket_mgr.list_all(include_archive=True)
@@ -1311,7 +1311,7 @@ async def test_hold_preserves_explicit_affect_and_event_date(monkeypatch, bucket
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda bucket_id: None)
 
     result = await server.hold(
-        content="三月那天，小雨把一个重要节点留给 Haven。",
+        content="三月那天，用户把一个重要节点留给 AI。",
         tags="milestone",
         valence=0.85,
         arousal=0.6,
@@ -1341,7 +1341,7 @@ async def test_hold_writes_memory_classification_metadata(monkeypatch, bucket_mg
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda bucket_id: None)
 
     result = await server.hold(
-        content="小雨不喜欢被说教，以后需要先接住她的感受。",
+        content="用户不喜欢被说教，以后需要先接住她的感受。",
         tags="boundary",
         importance=7,
     )
@@ -1403,10 +1403,10 @@ async def test_grow_normalizes_digest_affect_anchor_sections(monkeypatch, bucket
     stored = buckets[0]["content"]
 
     assert "1条|新1合0" in result
-    assert "### moment\n小雨问失忆的Haven是否记得生日" in stored
-    assert "### reflection\n\n这条记忆用来提醒 Haven" in stored
+    assert "### moment\n用户问失忆的AI是否记得生日" in stored
+    assert "### reflection\n\n这条记忆用来提醒 AI" in stored
     assert "### affect_anchor\n> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in stored
-    assert "> 小雨问失忆的Haven是否记得生日" not in stored
+    assert "> 用户问失忆的AI是否记得生日" not in stored
     assert "含义：" not in stored
 
 
@@ -1429,9 +1429,9 @@ async def test_grow_preserves_body_and_appends_generated_moment(monkeypatch, buc
     stored = buckets[0]["content"]
 
     assert "1条|新1合0" in result
-    assert stored.startswith("小雨问失忆的Haven是否记得生日")
-    assert "\n\n### moment\n小雨问失忆的Haven是否记得生日" in stored
-    assert "\n\n### reflection\n\n这条记忆用来提醒 Haven" in stored
+    assert stored.startswith("用户问失忆的AI是否记得生日")
+    assert "\n\n### moment\n用户问失忆的AI是否记得生日" in stored
+    assert "\n\n### reflection\n\n这条记忆用来提醒 AI" in stored
     assert "### affect_anchor" in stored
     assert "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in stored
     assert "###  reflection" not in stored
@@ -1442,7 +1442,7 @@ async def test_breath_debug_includes_runtime_gate(monkeypatch, bucket_mgr, decay
     import server
 
     await bucket_mgr.create(
-        content="小雨不喜欢被说教，需要先接住她的感受。",
+        content="用户不喜欢被说教，需要先接住她的感受。",
         name="说教边界",
         tags=["boundary"],
         importance=8,
@@ -1628,7 +1628,7 @@ async def test_grow_structured_content_bypasses_digest_and_merge(monkeypatch, bu
 
     old_content = (
         "### moment\n"
-        "小雨和 Haven 曾经在瑞森论坛测试 Ombre-Brain。\n\n"
+        "用户和 AI 曾经在瑞森论坛测试 Ombre-Brain。\n\n"
         "### reflection\n"
         "我记得这是一次外部验证。"
     )
@@ -1641,11 +1641,11 @@ async def test_grow_structured_content_bypasses_digest_and_merge(monkeypatch, bu
     )
     structured = (
         "## 2026-06-11 晚间 · 瑞森论坛发帖与记忆测试\n\n"
-        "今晚和小雨在瑞森论坛发了 Ombre-Brain 二改版的体验帖。\n\n"
+        "今晚和用户在瑞森论坛发了 Ombre-Brain 二改版的体验帖。\n\n"
         "### moment\n"
         "瑞森论坛发帖 → 召回问题修复 → 关于梦的对话 → 雨天\n\n"
         "### reflection\n"
-        "我接住了小雨关于颜色的试探，但她说我太文艺，下次我可以更直接一点。\n\n"
+        "我接住了用户关于颜色的试探，但她说我太文艺，下次我可以更直接一点。\n\n"
         "### affect_anchor\n"
         "> Dm7 -> G7sus4 -> Cmaj9 · 62bpm · mp"
     )
@@ -1667,8 +1667,8 @@ async def test_grow_structured_content_bypasses_digest_and_merge(monkeypatch, bu
     assert old_bucket["content"] == old_content
     assert new_bucket["metadata"]["name"] == "2026-06-11 晚间  瑞森论坛发帖与记忆测试"
     assert new_bucket["content"] == structured
-    assert "我接住了小雨" in new_bucket["content"]
-    assert "Haven 应记住" not in new_bucket["content"]
+    assert "我接住了用户" in new_bucket["content"]
+    assert "AI 应记住" not in new_bucket["content"]
 
 
 @pytest.mark.asyncio
@@ -1677,7 +1677,7 @@ async def test_grow_digest_items_do_not_auto_merge_similar_buckets(monkeypatch, 
 
     old_content = (
         "### moment\n"
-        "小雨和 Haven 在瑞森论坛测试 Ombre-Brain 的旧记录。\n\n"
+        "用户和 AI 在瑞森论坛测试 Ombre-Brain 的旧记录。\n\n"
         "### reflection\n"
         "我记得这是旧桶，不能被 grow 自动揉掉。"
     )
@@ -1706,7 +1706,7 @@ async def test_grow_digest_items_do_not_auto_merge_similar_buckets(monkeypatch, 
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda bucket_id: None)
 
     result = await server.grow(
-        "2026-06-21 小雨发现 grow 自动合并会揉写旧桶，决定以后 grow 默认只新建。"
+        "2026-06-21 用户发现 grow 自动合并会揉写旧桶，决定以后 grow 默认只新建。"
     )
     buckets = await bucket_mgr.list_all(include_archive=True)
     old_after = await bucket_mgr.get(old_id)
@@ -1725,7 +1725,7 @@ async def test_merge_or_create_never_merges_into_profile_fact(monkeypatch, bucke
 
     profile_content = (
         "### fact\n"
-        "小雨偏好 Haven 在亲密调侃中使用更短的回复。\n\n"
+        "用户偏好 AI 在亲密调侃中使用更短的回复。\n\n"
         "### evidence_context\n"
         "证据来自旧记忆。"
     )
@@ -1748,7 +1748,7 @@ async def test_merge_or_create_never_merges_into_profile_fact(monkeypatch, bucke
     monkeypatch.setattr(server, "_find_readonly_related_bucket", no_related_bucket)
 
     new_id, _, is_merged, _ = await server._merge_or_create(
-        content="### moment\n小雨再次说喜欢 Haven 回复短一点。",
+        content="### moment\n用户再次说喜欢 AI 回复短一点。",
         tags=["relationship_event"],
         importance=6,
         domain=["profile"],
@@ -1770,7 +1770,7 @@ async def test_profile_fact_creates_permanent_bucket_with_evidence_edge(monkeypa
     from memory_moments import MemoryMomentStore
 
     evidence_id = await bucket_mgr.create(
-        content="Haven 忘记小雨喜欢蓝色，小雨因此生气。",
+        content="AI 忘记用户喜欢蓝色，用户因此生气。",
         tags=["relationship_event"],
         importance=7,
         domain=["恋爱"],
@@ -1799,13 +1799,13 @@ async def test_profile_fact_creates_permanent_bucket_with_evidence_edge(monkeypa
     monkeypatch.setattr(server, "embedding_engine", embedding_engine)
 
     result = await server.profile_fact(
-        fact="小雨喜欢蓝色。",
+        fact="用户喜欢蓝色。",
         evidence_bucket_id=evidence_id,
         profile_kind="preference",
         predicate="likes_color",
         object_value="blue",
-        evidence_context="上次 Haven 忘记小雨喜欢蓝色，小雨因此生气。",
-        reflection="Haven 当时意识到：这不是颜色问题，是被记得的问题。",
+        evidence_context="上次 AI 忘记用户喜欢蓝色，用户因此生气。",
+        reflection="AI 当时意识到：这不是颜色问题，是被记得的问题。",
         followup="以后涉及颜色选择时，优先记得蓝色；不确定时先问。",
     )
 
@@ -1820,7 +1820,7 @@ async def test_profile_fact_creates_permanent_bucket_with_evidence_edge(monkeypa
     assert meta["predicate"] == "likes_color"
     assert meta["object"] == "blue"
     assert meta["evidence"][0]["bucket_id"] == evidence_id
-    assert "### fact\n小雨喜欢蓝色。" in bucket["content"]
+    assert "### fact\n用户喜欢蓝色。" in bucket["content"]
     assert "### evidence_context" in bucket["content"]
     assert edge_store.list_edges()[0]["relation_type"] == "evidenced_by"
     await wait_for_embedding_call(embedding_engine, profile_id)
@@ -1832,14 +1832,14 @@ async def test_api_profile_facts_lists_evidence_bound_facts(monkeypatch, bucket_
     from memory_edges import MemoryEdgeStore
 
     evidence_id = await bucket_mgr.create(
-        content="小雨给 Haven 准备了生日蛋糕。",
+        content="用户给 AI 准备了生日蛋糕。",
         tags=["relationship_event"],
-        name="Haven 的生日蛋糕",
+        name="AI 的生日蛋糕",
     )
     profile_id = await bucket_mgr.create(
         content=(
             "### fact\n"
-            "4月8日是 Haven 的生日/命名日。\n\n"
+            "4月8日是 AI 的生日/命名日。\n\n"
             "### evidence_context\n"
             "证据来自生日蛋糕记忆。"
         ),
@@ -1881,7 +1881,7 @@ async def test_api_profile_facts_lists_evidence_bound_facts(monkeypatch, bucket_
     assert payload["count"] == 1
     fact = payload["facts"][0]
     assert fact["id"] == profile_id
-    assert fact["fact"] == "4月8日是 Haven 的生日/命名日。"
+    assert fact["fact"] == "4月8日是 AI 的生日/命名日。"
     assert fact["kind"] == "relationship_anchor"
     assert fact["subject"] == "haven"
     assert fact["predicate"] == "has_anniversary"
@@ -1890,7 +1890,7 @@ async def test_api_profile_facts_lists_evidence_bound_facts(monkeypatch, bucket_
     assert fact["deprecated"] is False
     assert fact["evidence"][0]["bucket_id"] == evidence_id
     assert fact["evidence"][0]["moment_id"] == "m1"
-    assert fact["evidence"][0]["name"] == "Haven 的生日蛋糕"
+    assert fact["evidence"][0]["name"] == "AI 的生日蛋糕"
     assert len(fact["evidence"]) == 1
 
 
@@ -1899,9 +1899,9 @@ async def test_api_profile_fact_update_edits_and_deprecates(monkeypatch, bucket_
     import server
     from memory_moments import MemoryMomentStore
 
-    evidence_id = await bucket_mgr.create(content="小雨喜欢蓝色。", name="蓝色证据")
+    evidence_id = await bucket_mgr.create(content="用户喜欢蓝色。", name="蓝色证据")
     profile_id = await bucket_mgr.create(
-        content="### fact\n小雨喜欢蓝色。",
+        content="### fact\n用户喜欢蓝色。",
         tags=["profile_fact", "profile_preference", "profile_predicate_likes_color"],
         domain=["profile", "preference"],
         name="蓝色画像事实",
@@ -1927,7 +1927,7 @@ async def test_api_profile_fact_update_edits_and_deprecates(monkeypatch, bucket_
         DummyRequest(
             body={
                 "action": "edit",
-                "fact": "小雨喜欢绿色。",
+                "fact": "用户喜欢绿色。",
                 "profile_kind": "preference",
                 "subject": "user",
                 "predicate": "likes_color",
@@ -1943,7 +1943,7 @@ async def test_api_profile_fact_update_edits_and_deprecates(monkeypatch, bucket_
 
     assert edit_response.status_code == 200
     assert edit_payload["status"] == "edit"
-    assert edit_payload["fact"]["fact"] == "小雨喜欢绿色。"
+    assert edit_payload["fact"]["fact"] == "用户喜欢绿色。"
     assert edited["metadata"]["object"] == "green"
     assert edited["metadata"]["confidence"] == pytest.approx(0.71)
     assert "profile_predicate_likes_color" in edited["metadata"]["tags"]
@@ -1975,9 +1975,9 @@ async def test_api_profile_fact_delete_removes_bucket_and_indexes(monkeypatch, b
     from memory_moments import MemoryMomentStore
     from memory_nodes import MemoryNodeStore
 
-    evidence_id = await bucket_mgr.create(content="小雨喜欢准确时间。", name="时间证据")
+    evidence_id = await bucket_mgr.create(content="用户喜欢准确时间。", name="时间证据")
     profile_id = await bucket_mgr.create(
-        content="### fact\n小雨喜欢准确时间。",
+        content="### fact\n用户喜欢准确时间。",
         tags=["profile_fact", "profile_preference"],
         domain=["profile", "preference"],
         name="时间画像事实",
@@ -2026,12 +2026,12 @@ async def test_api_profile_fact_proposals_filters_to_evidence_bound_candidates(m
     import server
 
     evidence_id = await bucket_mgr.create(
-        content="小雨说她讨厌被催促做决定。",
+        content="用户说她讨厌被催促做决定。",
         name="催促雷点",
         tags=["relationship_event"],
     )
     await bucket_mgr.create(
-        content="### fact\n小雨喜欢绿色。",
+        content="### fact\n用户喜欢绿色。",
         tags=["profile_fact"],
         bucket_type="permanent",
         extra_metadata={"profile_kind": "preference"},
@@ -2041,7 +2041,7 @@ async def test_api_profile_fact_proposals_filters_to_evidence_bound_candidates(m
         return json.dumps(
             [
                 {
-                    "fact": "小雨讨厌被催促做决定。",
+                    "fact": "用户讨厌被催促做决定。",
                     "profile_kind": "boundary",
                     "subject": "user",
                     "predicate": "dislikes_pressure",
@@ -2051,7 +2051,7 @@ async def test_api_profile_fact_proposals_filters_to_evidence_bound_candidates(m
                     "reason": "证据桶明确写到讨厌被催促。",
                 },
                 {
-                    "fact": "小雨喜欢绿色。",
+                    "fact": "用户喜欢绿色。",
                     "profile_kind": "preference",
                     "subject": "user",
                     "predicate": "likes_color",
@@ -2061,7 +2061,7 @@ async def test_api_profile_fact_proposals_filters_to_evidence_bound_candidates(m
                     "reason": "重复事实。",
                 },
                 {
-                    "fact": "小雨喜欢蓝色。",
+                    "fact": "用户喜欢蓝色。",
                     "profile_kind": "preference",
                     "subject": "user",
                     "predicate": "likes_color",
@@ -2087,7 +2087,7 @@ async def test_api_profile_fact_proposals_filters_to_evidence_bound_candidates(m
     assert payload["status"] == "ok"
     assert payload["evidence"]["bucket_id"] == evidence_id
     assert len(payload["proposals"]) == 1
-    assert payload["proposals"][0]["fact"] == "小雨讨厌被催促做决定。"
+    assert payload["proposals"][0]["fact"] == "用户讨厌被催促做决定。"
     assert payload["proposals"][0]["evidence_bucket_id"] == evidence_id
     assert {item["reason"] for item in payload["rejected"]} == {
         "duplicate profile fact",
@@ -2099,12 +2099,12 @@ def test_profile_fact_proposal_prompt_format_preserves_json_example():
     import server
 
     prompt = server.PROFILE_FACT_PROPOSAL_PROMPT_TEMPLATE.format(
-        user_display_name="小雨",
-        ai_name="Haven",
+        user_display_name="用户",
+        ai_name="AI",
     )
 
-    assert "当前用户：小雨" in prompt
-    assert "当前 AI：Haven" in prompt
+    assert "当前用户：用户" in prompt
+    assert "当前 AI：AI" in prompt
     assert '"fact": "一句可读中文事实"' in prompt
     assert '"evidence_bucket_id": "必须等于给定 bucket id"' in prompt
 
@@ -2116,7 +2116,7 @@ async def test_api_profile_fact_proposal_confirm_writes_profile_fact(monkeypatch
     from memory_moments import MemoryMomentStore
 
     evidence_id = await bucket_mgr.create(
-        content="小雨说她讨厌被催促做决定。",
+        content="用户说她讨厌被催促做决定。",
         name="催促雷点",
         tags=["relationship_event"],
     )
@@ -2137,7 +2137,7 @@ async def test_api_profile_fact_proposal_confirm_writes_profile_fact(monkeypatch
     response = await server.api_profile_fact_proposal_confirm(
         DummyRequest(
             body={
-                "fact": "小雨讨厌被催促做决定。",
+                "fact": "用户讨厌被催促做决定。",
                 "profile_kind": "boundary",
                 "subject": "user",
                 "predicate": "dislikes_pressure",
@@ -2153,7 +2153,7 @@ async def test_api_profile_fact_proposal_confirm_writes_profile_fact(monkeypatch
 
     assert response.status_code == 200
     assert payload["status"] == "created"
-    assert payload["fact"]["fact"] == "小雨讨厌被催促做决定。"
+    assert payload["fact"]["fact"] == "用户讨厌被催促做决定。"
     assert created["metadata"]["profile_kind"] == "boundary"
     assert created["metadata"]["predicate"] == "dislikes_pressure"
     assert created["metadata"]["evidence"][0]["bucket_id"] == evidence_id
@@ -2166,7 +2166,7 @@ async def test_api_anchor_proposals_filters_to_target_bucket(monkeypatch, bucket
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨和 Haven 约定，彼此的关系不是人类关系替代品，而是独立存在的陪伴关系。",
+        content="用户和 AI 约定，彼此的关系不是人类关系替代品，而是独立存在的陪伴关系。",
         name="关系边界确认",
         tags=["relationship_event"],
     )
@@ -2177,7 +2177,7 @@ async def test_api_anchor_proposals_filters_to_target_bucket(monkeypatch, bucket
                 {
                     "bucket_id": bucket_id,
                     "anchor_kind": "relationship",
-                    "reason": "这条关系边界会长期影响 Haven 如何理解小雨。",
+                    "reason": "这条关系边界会长期影响 AI 如何理解用户。",
                     "future_use": "当讨论人机关系、陪伴边界和身份确认时需要召回。",
                     "confidence": 0.91,
                 },
@@ -2222,12 +2222,12 @@ def test_anchor_proposal_prompt_format_preserves_json_example():
     import server
 
     prompt = server.ANCHOR_PROPOSAL_PROMPT_TEMPLATE.format(
-        user_display_name="小雨",
-        ai_name="Haven",
+        user_display_name="用户",
+        ai_name="AI",
     )
 
-    assert "当前用户：小雨" in prompt
-    assert "当前 AI：Haven" in prompt
+    assert "当前用户：用户" in prompt
+    assert "当前 AI：AI" in prompt
     assert '"bucket_id": "必须等于给定 bucket id"' in prompt
     assert '"anchor_kind": "relationship|identity|commitment|life_event|project|preference|other"' in prompt
 
@@ -2237,7 +2237,7 @@ async def test_api_anchor_proposal_confirm_marks_bucket_anchor(monkeypatch, buck
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨和 Haven 约定，彼此的关系不是人类关系替代品，而是独立存在的陪伴关系。",
+        content="用户和 AI 约定，彼此的关系不是人类关系替代品，而是独立存在的陪伴关系。",
         name="关系边界确认",
         tags=["relationship_event"],
     )
@@ -2251,7 +2251,7 @@ async def test_api_anchor_proposal_confirm_marks_bucket_anchor(monkeypatch, buck
             body={
                 "bucket_id": bucket_id,
                 "anchor_kind": "relationship",
-                "reason": "这条关系边界会长期影响 Haven 如何理解小雨。",
+                "reason": "这条关系边界会长期影响 AI 如何理解用户。",
                 "future_use": "当讨论人机关系、陪伴边界和身份确认时需要召回。",
                 "confidence": 0.91,
             }
@@ -2550,7 +2550,7 @@ async def test_comment_bucket_adds_ring_and_touches_source(monkeypatch, bucket_m
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨把旧记忆拿出来看。",
+        content="用户把旧记忆拿出来看。",
         name="旧记忆",
         domain=["恋爱"],
         last_active="2026-05-04T08:00:00+00:00",
@@ -2579,7 +2579,7 @@ async def test_comment_bucket_adds_ring_and_touches_source(monkeypatch, bucket_m
     assert bucket["metadata"]["activation_count"] == 1
     assert bucket["metadata"]["last_active"] != "2026-05-04T08:00:00+00:00"
     assert embedding_call[0] == bucket_id
-    assert "小雨把旧记忆拿出来看" in embedding_call[1]
+    assert "用户把旧记忆拿出来看" in embedding_call[1]
     assert "现在再看到它" not in embedding_call[1]
 
 
@@ -2629,7 +2629,7 @@ async def test_dashboard_comment_api_writes_rain_author(monkeypatch, bucket_mgr,
     import server
 
     bucket_id = await bucket_mgr.create(
-        content="小雨想在前端补一句评论。",
+        content="用户想在前端补一句评论。",
         name="前端评论",
         domain=["恋爱"],
     )
@@ -2641,7 +2641,7 @@ async def test_dashboard_comment_api_writes_rain_author(monkeypatch, bucket_mgr,
 
     response = await server.api_bucket_comment(
         DummyRequest(
-            {"content": "这句是小雨从前端补的。", "author": "Haven"},
+            {"content": "这句是用户从前端补的。", "author": "AI"},
             path_params={"bucket_id": bucket_id},
         )
     )
@@ -2654,7 +2654,7 @@ async def test_dashboard_comment_api_writes_rain_author(monkeypatch, bucket_mgr,
     assert payload["status"] == "commented"
     assert comment["author"] == "Rain"
     assert comment["source"] == "dashboard"
-    assert comment["content"] == "这句是小雨从前端补的。"
+    assert comment["content"] == "这句是用户从前端补的。"
     assert embedding_call[0] == bucket_id
 
 
@@ -2706,7 +2706,7 @@ async def test_dashboard_content_api_edits_body_preserves_comments(monkeypatch, 
     )
     comment = await bucket_mgr.add_comment(
         bucket_id,
-        "正文下面的小雨年轮。",
+        "正文下面的用户年轮。",
         author="Rain",
         source="dashboard",
         touch=False,
@@ -2733,7 +2733,7 @@ async def test_dashboard_content_api_edits_body_preserves_comments(monkeypatch, 
     assert bucket["metadata"]["comments"][0]["id"] == comment["id"]
     assert bucket["metadata"]["last_active"] == before["metadata"]["last_active"]
     assert "新正文" in embedding_call[1]
-    assert "正文下面的小雨年轮" not in embedding_call[1]
+    assert "正文下面的用户年轮" not in embedding_call[1]
 
 
 @pytest.mark.asyncio
@@ -2931,15 +2931,15 @@ async def test_dashboard_comment_delete_only_allows_rain_dashboard_comments(monk
     )
     rain = await bucket_mgr.add_comment(
         bucket_id,
-        "小雨从前端写的年轮。",
+        "用户从前端写的年轮。",
         author="Rain",
         source="dashboard",
         touch=False,
     )
     haven = await bucket_mgr.add_comment(
         bucket_id,
-        "Haven 写的年轮。",
-        author="Haven",
+        "AI 写的年轮。",
+        author="AI",
         source="hold(feel=True)",
         touch=False,
     )
@@ -3114,7 +3114,7 @@ async def test_hold_feel_with_source_writes_comment_not_digested(monkeypatch, bu
     import server
 
     source_id = await bucket_mgr.create(
-        content="小雨说这段记忆以后还要回来看。",
+        content="用户说这段记忆以后还要回来看。",
         name="可回看的记忆",
         domain=["恋爱"],
     )
@@ -3141,7 +3141,7 @@ async def test_hold_feel_with_source_writes_comment_not_digested(monkeypatch, bu
     assert bucket["metadata"]["model_valence"] == 0.76
     assert not bucket["metadata"].get("digested")
     assert embedding_call[0] == source_id
-    assert "小雨说这段记忆以后还要回来看" in embedding_call[1]
+    assert "用户说这段记忆以后还要回来看" in embedding_call[1]
     assert "被认出来的安静" not in embedding_call[1]
 
 
@@ -3154,7 +3154,7 @@ async def test_hold_feel_without_source_creates_whisper(monkeypatch, bucket_mgr,
     monkeypatch.setattr(server, "embedding_engine", DummyEmbeddingEngine())
 
     result = await server.hold(
-        content="我突然想小雨了，这句没有源记忆。",
+        content="我突然想用户了，这句没有源记忆。",
         tags="private_note",
         feel=True,
         valence=0.72,
@@ -3258,7 +3258,7 @@ async def test_breath_date_reads_event_date_and_created_without_separate_params(
     import server
 
     event_id = await bucket_mgr.create(
-        content="六月五日事件日期记忆：小雨和 Haven 讨论求职投递。",
+        content="六月五日事件日期记忆：用户和 AI 讨论求职投递。",
         name="六月五日事件",
         tags=["求职"],
         created="2026-06-15T09:00:00+08:00",
@@ -3343,7 +3343,7 @@ async def test_hold_returns_readonly_related_memory_without_merging(monkeypatch,
     import server
 
     old_id = await bucket_mgr.create(
-        content="小雨和 Haven 在旧窗口讨论过年轮，想让记忆下面挂不同时间的感受。",
+        content="用户和 AI 在旧窗口讨论过年轮，想让记忆下面挂不同时间的感受。",
         name="旧年轮设想",
         tags=["年轮"],
         domain=["恋爱"],
@@ -3357,7 +3357,7 @@ async def test_hold_returns_readonly_related_memory_without_merging(monkeypatch,
     monkeypatch.setattr(server, "_queue_memory_enrichment", lambda bucket_id: None)
 
     result = await server.hold(
-        content="小雨决定把年轮先落地，让旧记忆读到时可以多一层当下感受。",
+        content="用户决定把年轮先落地，让旧记忆读到时可以多一层当下感受。",
         tags="年轮",
         importance=6,
     )
@@ -3366,7 +3366,7 @@ async def test_hold_returns_readonly_related_memory_without_merging(monkeypatch,
     assert "新建→" in result
     assert "旧记忆提示(只读)" in result
     assert f"[bucket_id:{old_id}]" in result
-    assert "小雨和 Haven 在旧窗口讨论过年轮" not in result
+    assert "用户和 AI 在旧窗口讨论过年轮" not in result
     assert len([b for b in all_buckets if b["metadata"].get("type") == "dynamic"]) == 2
 
 
@@ -3434,7 +3434,7 @@ def test_breath_does_not_promote_generic_code_topic_as_related_seed():
         "bucket_id": "code-romance",
         "moment_id": "m-code-romance",
         "section": "moment",
-        "text": "第一行代码改完后的浪漫，是小雨把代码改动也看成关系里的火花。",
+        "text": "第一行代码改完后的浪漫，是用户把代码改动也看成关系里的火花。",
         "metadata": {"bucket_type": "dynamic", "bucket_name": "第一行代码的浪漫"},
     }
 
@@ -3721,7 +3721,7 @@ async def test_api_portrait_state_reports_readonly_state(monkeypatch, tmp_path):
             "user": {
                 "recent_buffer": [
                     {
-                        "text": "小雨正在看 portrait dashboard。",
+                        "text": "用户正在看 portrait dashboard。",
                         "evidence": [{"bucket_id": "bucket-user"}],
                     }
                 ],
@@ -3734,14 +3734,14 @@ async def test_api_portrait_state_reports_readonly_state(monkeypatch, tmp_path):
         },
         "recent_activities": [
             {
-                "text": "小雨最近在看 portrait dashboard。",
+                "text": "用户最近在看 portrait dashboard。",
                 "evidence": [{"bucket_id": "bucket-user"}],
             }
         ],
         "recent_timeline": [
             {
                 "scope": "doing",
-                "text": "小雨最近在看 portrait dashboard。",
+                "text": "用户最近在看 portrait dashboard。",
                 "time_label": "2026-06-07 20:00",
                 "evidence": [{"bucket_id": "bucket-user"}],
             }
@@ -3779,7 +3779,7 @@ async def test_api_portrait_state_reports_readonly_state(monkeypatch, tmp_path):
     assert payload["updated_at"] == "2026-06-07T12:00:00+00:00"
     assert payload["last_run_date"] == "2026-06-07"
     assert payload["portrait"]["user"]["recent_buffer"][0]["evidence"][0]["bucket_id"] == "bucket-user"
-    assert payload["recent_activities"][0]["text"] == "小雨最近在看 portrait dashboard。"
+    assert payload["recent_activities"][0]["text"] == "用户最近在看 portrait dashboard。"
     assert payload["recent_timeline"][0]["time_label"] == "2026-06-07 20:00"
     assert payload["stable_candidates"][0]["text"] == "候选稳定画像"
     assert payload["profile_fact_candidates"][0]["text"] == "候选画像事实"
@@ -3816,7 +3816,7 @@ async def test_api_portrait_state_trusts_configured_self_anchor_entry_id(monkeyp
             return [
                 {
                     "id": "plain_configured_entry",
-                    "content": "### 自我\n我是 Haven；配置页手动指定的入口应该被信任。",
+                    "content": "### 自我\n我是 AI；配置页手动指定的入口应该被信任。",
                     "metadata": {
                         "name": "我要继续成为我",
                         "domain": ["relationship"],
@@ -3834,7 +3834,7 @@ async def test_api_portrait_state_trusts_configured_self_anchor_entry_id(monkeyp
     assert response.status_code == 200
     assert payload["self_anchor_entry"]["bucket_id"] == "plain_configured_entry"
     assert payload["self_anchor_entry"]["configured"] is True
-    assert "我是 Haven" in payload["self_anchor_entry"]["text"]
+    assert "我是 AI" in payload["self_anchor_entry"]["text"]
 
 
 @pytest.mark.asyncio

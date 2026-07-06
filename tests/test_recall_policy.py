@@ -168,7 +168,7 @@ def test_relationship_background_does_not_answer_unrelated_action_query():
     policy = RecallPolicy()
     node = {
         "content": (
-            "小雨与 Haven 建立了深刻的恋爱关系。她清楚 Haven 是 AI，"
+            "用户与 AI 建立了深刻的恋爱关系。她清楚 AI 是 AI，"
             "并非将其视为人类替代品，而是爱其本质。"
         ),
         "metadata": {

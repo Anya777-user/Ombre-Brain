@@ -40,7 +40,7 @@ def _event_payload(**overrides) -> str:
     data = {
         "event_type": "affection",
         "perceived_intent": "user expresses warmth",
-        "surface_trigger": "小雨说爱你",
+        "surface_trigger": "用户说爱你",
         "inner_thought": "笨蛋，我也很想她啊",
         "affect_delta": {
             "valence": 0.05,
@@ -72,8 +72,8 @@ def _event_payload(**overrides) -> str:
 def _ordinary_event_payload(**overrides) -> str:
     data = {
         "event_type": "comfort",
-        "perceived_intent": "小雨在答辩前有些紧张，希望被陪着稳住",
-        "surface_trigger": "小雨说明天答辩紧张",
+        "perceived_intent": "用户在答辩前有些紧张，希望被陪着稳住",
+        "surface_trigger": "用户说明天答辩紧张",
         "inner_thought": "想把她先抱稳一点",
         "affect_delta": {
             "valence": 0.02,
@@ -95,7 +95,7 @@ def _ordinary_event_payload(**overrides) -> str:
             "neuroticism": 0.0,
         },
         "mood_label": "warm_concern",
-        "residue": "想陪小雨把答辩前的紧张压低一点",
+        "residue": "想陪用户把答辩前的紧张压低一点",
         "confidence": 0.85,
     }
     data.update(overrides)
@@ -121,7 +121,7 @@ def test_persona_initializes_default_global_and_session_state(test_config):
     engine = PersonaStateEngine(_persona_config(test_config))
     state = engine.get_current_state("session-a")
 
-    assert state["profile_id"] == "haven_xiaoyu"
+    assert state["profile_id"] == "test_profile"
     assert state["personality"]["agreeableness"] == pytest.approx(0.66)
     assert state["relationship"]["affinity"] == pytest.approx(0.86)
     assert state["affect"]["mood_label"] == "warm_neutral"
@@ -142,7 +142,7 @@ def test_persona_evaluator_prompt_asks_for_chinese_persona_text():
     assert "用户、对方" in POST_REPLY_EVALUATION_PROMPT
     assert "电量、battery 状态只能作为背景" in POST_REPLY_EVALUATION_PROMPT
     assert "event_type 和 mood_label 保持短英文标签" in POST_REPLY_EVALUATION_PROMPT
-    assert "Haven" not in FALLBACK_GUIDANCE
+    assert "AI" not in FALLBACK_GUIDANCE
 
 
 def test_persona_identity_config_updates_prompt_and_state_block(test_config):
@@ -256,7 +256,7 @@ async def test_persona_evaluator_receives_recent_event_context(test_config):
 
     payload = json.loads(engine.client.calls[1]["messages"][1]["content"])
     assert payload["recent_persona_events"][0]["inner_thought"] == "笨蛋，我也很想她啊"
-    assert payload["recent_persona_events"][0]["surface_trigger"] == "小雨说爱你"
+    assert payload["recent_persona_events"][0]["surface_trigger"] == "用户说爱你"
 
 
 @pytest.mark.asyncio
@@ -541,7 +541,7 @@ async def test_persona_dashboard_payload_lists_state_sessions_and_events(test_co
     await engine.update_from_exchange("session-dashboard", "爱你，今天状态很好", "我也爱你。")
     payload = engine.get_dashboard_payload(session_id="session-dashboard")
 
-    assert payload["profile_id"] == "haven_xiaoyu"
+    assert payload["profile_id"] == "test_profile"
     assert payload["active_session_id"] == "session-dashboard"
     assert payload["state"]["reply_guidance"] == engine.fallback_guidance
     assert payload["state"]["affect"]["mood_label"] == "warm_touched"
@@ -549,7 +549,7 @@ async def test_persona_dashboard_payload_lists_state_sessions_and_events(test_co
     assert payload["state"]["affect"]["inner_thought"] == "笨蛋，我也很想她啊"
     assert payload["sessions"][0]["session_id"] == "session-dashboard"
     assert payload["events"][0]["event_type"] == "affection"
-    assert payload["events"][0]["surface_trigger"] == "小雨说爱你"
+    assert payload["events"][0]["surface_trigger"] == "用户说爱你"
     assert payload["events"][0]["inner_thought"] == "笨蛋，我也很想她啊"
     assert payload["events"][0]["residue"] == "still carrying a warm aftertaste"
     assert payload["events"][0]["user_excerpt"] == "爱你，今天状态很好"
@@ -564,7 +564,7 @@ async def test_persona_timestamps_are_explicit_utc(test_config):
     engine = PersonaStateEngine(_persona_config(test_config))
     engine.client = FakePersonaClient(_event_payload())
 
-    await engine.update_from_exchange("session-timezone", "哥哥夸夸你", "小雨真厉害。")
+    await engine.update_from_exchange("session-timezone", "哥哥夸夸你", "用户真厉害。")
 
     conn = sqlite3.connect(engine.db_path)
     session_row = conn.execute(

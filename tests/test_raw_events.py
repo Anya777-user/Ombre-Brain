@@ -33,7 +33,7 @@ def test_raw_event_store_keeps_only_user_assistant_originals(tmp_path):
             {
                 "source_event_id": "u1",
                 "role": "user",
-                "text": "小雨说这句原话要永远保留。",
+                "text": "用户说这句原话要永远保留。",
                 "created_at": "2026-06-22T10:00:00+08:00",
                 "conversation_id": "c1",
             },
@@ -68,7 +68,7 @@ def test_raw_event_store_keeps_only_user_assistant_originals(tmp_path):
             {
                 "source_event_id": "u1",
                 "role": "user",
-                "text": "小雨说这句原话要永远保留。",
+                "text": "用户说这句原话要永远保留。",
                 "created_at": "2026-06-22T10:00:00+08:00",
                 "conversation_id": "c1",
             }
@@ -80,7 +80,7 @@ def test_raw_event_store_keeps_only_user_assistant_originals(tmp_path):
     search = store.search("原话", source="script")
     assert search["count"] == 1
     assert search["items"][0]["role"] == "user"
-    assert search["items"][0]["text"] == "小雨说这句原话要永远保留。"
+    assert search["items"][0]["text"] == "用户说这句原话要永远保留。"
 
 
 def test_raw_event_store_strips_client_context_attachments(tmp_path):

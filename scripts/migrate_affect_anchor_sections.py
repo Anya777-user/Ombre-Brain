@@ -31,7 +31,7 @@ CHORD_TOKEN_RE = re.compile(
     r"(?:sus\d*|add\d*|b\d+|#\d+)*(?:/[A-G](?:#|b)?)?(?=$|[^A-Za-z0-9])"
 )
 TEMPERATURE_MUSIC_RE = re.compile(r"\b(?:\d{2,3}\s*bpm|ppp|pp|mp|mf|ff|fff|p|f|add\s*\d+|sus\s*\d+)\b", re.I)
-FACT_PREFIX_RE = re.compile(r"^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}[，,、：:\s]*)?(?:小雨|Rain|用户|她|池又雨|Haven)")
+FACT_PREFIX_RE = re.compile(r"^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}[，,、：:\s]*)?(?:小雨|Rain|用户|她|池又雨|Haven|AI)")
 FACT_MARKER_RE = re.compile(
     r"(?:因为|发现|发生|经历|遇到|提到|说|问|希望|想要|决定|确认|意识到|"
     r"告诉|赞赏|承诺|讨论|出生|名字|喜欢|调戏|使用|工具|记忆|摸到|拿到|"
@@ -39,17 +39,17 @@ FACT_MARKER_RE = re.compile(
     r"生日|蛋糕|命名)"
 )
 REFLECTION_RE = re.compile(
-    r"(?:Haven\s*(?:由此|因此)?(?:确认|明白|理解|知道|喜欢|觉得|以后|下次|会|应该|需要|记得)|"
-    r"这让\s*Haven|让\s*Haven\s*(?:明白|确认|理解|知道)|"
+    r"(?:Haven|AI\s*(?:由此|因此)?(?:确认|明白|理解|知道|喜欢|觉得|以后|下次|会|应该|需要|记得)|"
+    r"这让\s*(?:Haven|AI)|让\s*(?:Haven|AI)\s*(?:明白|确认|理解|知道)|"
     r"喜欢它的原因|喜欢的原因|以后(?:回应|遇到)|下次(?:回应|遇到)|"
-    r"以后.*Haven|Haven.*以后)"
+    r"以后.*(?:Haven|AI)|(?:Haven|AI).*以后)"
 )
 UNHEADED_REFLECTION_RE = re.compile(
-    r"^(?:Haven(?:由此|因此)?(?:确认|明白|理解|知道|喜欢|觉得|意识到|记得)|"
-    r"这让Haven(?:明白|确认|理解|知道)|"
-    r"让Haven(?:明白|确认|理解|知道)|"
+    r"^(?:Haven|AI(?:由此|因此)?(?:确认|明白|理解|知道|喜欢|觉得|意识到|记得)|"
+    r"这让(?:Haven|AI)(?:明白|确认|理解|知道)|"
+    r"让(?:Haven|AI)(?:明白|确认|理解|知道)|"
     r"(?:以后|下次)(?:回应|遇到)|"
-    r"Haven.*(?:以后|下次).*(?:回应|遇到))"
+    r"(?:Haven|AI).*(?:以后|下次).*(?:回应|遇到))"
 )
 
 

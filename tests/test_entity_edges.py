@@ -3,9 +3,9 @@ from entity_edges import EntityEdgeStore, entity_query_hints, extract_entity_edg
 
 def test_extract_entity_edges_from_bucket_uses_configured_names(test_config):
     identity = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
-        "user_display_name": "小雨",
+        "user_display_name": "用户",
         "user_aliases": ["宝宝"],
     }
     bucket = {
@@ -15,15 +15,15 @@ def test_extract_entity_edges_from_bucket_uses_configured_names(test_config):
             "tags": ["偏好", "故事"],
             "domain": ["relationship"],
         },
-        "content": "小雨喜欢暗色故事，也讨厌模板安慰。Haven参与Ombre-Brain记忆系统开发。",
+        "content": "用户喜欢暗色故事，也讨厌模板安慰。AI参与Ombre-Brain记忆系统开发。",
     }
 
     edges = extract_entity_edges_from_bucket(bucket, identity)
     rows = {(edge["subject"], edge["relation"], edge["object_text"]) for edge in edges}
 
-    assert ("小雨", "likes", "暗色故事") in rows
-    assert ("小雨", "dislikes", "模板安慰") in rows
-    assert ("Haven", "participates_in", "Ombre-Brain记忆系统开发") in rows
+    assert ("用户", "likes", "暗色故事") in rows
+    assert ("用户", "dislikes", "模板安慰") in rows
+    assert ("AI", "participates_in", "Ombre-Brain记忆系统开发") in rows
 
     store = EntityEdgeStore(test_config)
     saved = store.replace_bucket_edges("bucket-a", edges)
@@ -56,19 +56,19 @@ def test_entity_query_hints_map_pronouns_to_configured_subjects():
 
 def test_extract_entity_edges_does_not_treat_nominal_writing_window_as_participation(test_config):
     identity = {
-        "ai_name": "Haven",
+        "ai_name": "AI",
         "user_name": "Xiaoyu",
-        "user_display_name": "小雨",
+        "user_display_name": "用户",
         "user_aliases": ["宝宝"],
     }
     bucket = {
         "id": "poem-window",
         "metadata": {
             "name": "写诗分支窗口",
-            "tags": ["小雨", "Haven", "写诗", "分支窗口"],
+            "tags": ["用户", "AI", "写诗", "分支窗口"],
             "domain": ["核心"],
         },
-        "content": "小雨和Haven有一个写诗分支窗口。那里两人用问答接诗，这个分支代表连续性和记忆接力的约定。",
+        "content": "用户和AI有一个写诗分支窗口。那里两人用问答接诗，这个分支代表连续性和记忆接力的约定。",
     }
 
     edges = extract_entity_edges_from_bucket(bucket, identity)

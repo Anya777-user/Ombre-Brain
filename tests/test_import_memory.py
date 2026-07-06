@@ -52,7 +52,7 @@ def test_chatgpt_json_parser_skips_non_chat_roles():
                 "user": {
                     "message": {
                         "author": {"role": "user"},
-                        "content": {"parts": ["小雨说今晚想听故事。"]},
+                        "content": {"parts": ["用户说今晚想听故事。"]},
                         "create_time": 2,
                     }
                 },
@@ -66,7 +66,7 @@ def test_chatgpt_json_parser_skips_non_chat_roles():
                 "assistant": {
                     "message": {
                         "author": {"role": "assistant"},
-                        "content": {"parts": ["Haven 回应她。"]},
+                        "content": {"parts": ["AI 回应她。"]},
                         "create_time": 4,
                     }
                 },
@@ -78,8 +78,8 @@ def test_chatgpt_json_parser_skips_non_chat_roles():
     turns = detect_and_parse(raw, "chat.json")
 
     assert [(turn["role"], turn["content"]) for turn in turns] == [
-        ("user", "小雨说今晚想听故事。"),
-        ("assistant", "Haven 回应她。"),
+        ("user", "用户说今晚想听故事。"),
+        ("assistant", "AI 回应她。"),
     ]
 
 
@@ -159,7 +159,7 @@ def test_import_extraction_keeps_output_budget_and_does_not_truncate_input():
 
 @pytest.mark.asyncio
 async def test_import_dedupes_existing_bucket_by_content(test_config, bucket_mgr):
-    content = "小雨决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。"
+    content = "用户决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。"
     await bucket_mgr.create(
         content=content,
         name="婚礼安排",
@@ -185,7 +185,7 @@ async def test_import_dedupes_existing_bucket_by_content(test_config, bucket_mgr
 
 @pytest.mark.asyncio
 async def test_import_process_counts_duplicate_separately_from_merge(test_config, bucket_mgr):
-    content = "小雨决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。"
+    content = "用户决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。"
     await bucket_mgr.create(content=content, name="婚礼安排", domain=["人际"])
     engine = ImportEngine(test_config, bucket_mgr, DummyDehydrator())
 
@@ -221,7 +221,7 @@ async def test_import_process_counts_duplicate_separately_from_merge(test_config
 @pytest.mark.asyncio
 async def test_import_dedupes_existing_bucket_by_similar_body(test_config, bucket_mgr):
     await bucket_mgr.create(
-        content="小雨决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。",
+        content="用户决定周末去杭州参加朋友婚礼，需要提前买高铁票并准备蓝色连衣裙。",
         name="婚礼安排",
         domain=["人际"],
         tags=["婚礼", "杭州"],
@@ -231,7 +231,7 @@ async def test_import_dedupes_existing_bucket_by_similar_body(test_config, bucke
     status = await engine._merge_or_create_item(
         {
             "name": "杭州待办",
-            "content": "周末小雨要去杭州参加朋友的婚礼，她需要提前订高铁票，也想带上蓝色连衣裙。",
+            "content": "周末用户要去杭州参加朋友的婚礼，她需要提前订高铁票，也想带上蓝色连衣裙。",
             "domain": ["事务"],
             "tags": ["高铁", "待办"],
             "importance": 6,
@@ -249,7 +249,7 @@ async def test_import_created_bucket_keeps_source_chunk_metadata(test_config, bu
     status = await engine._merge_or_create_item(
         {
             "name": "来源追踪",
-            "content": "小雨希望导入出来的每条记忆都能追溯到原始 chunk，方便之后审查。",
+            "content": "用户希望导入出来的每条记忆都能追溯到原始 chunk，方便之后审查。",
             "domain": ["数字"],
             "tags": ["导入", "追溯"],
             "importance": 6,
@@ -345,7 +345,7 @@ async def test_import_auto_merge_requires_high_content_similarity(test_config):
             return [
                 {
                     "id": "old",
-                    "content": "小雨周末去杭州参加朋友婚礼，需要订高铁票。",
+                    "content": "用户周末去杭州参加朋友婚礼，需要订高铁票。",
                     "metadata": {
                         "name": "杭州婚礼",
                         "domain": ["事务"],
@@ -394,7 +394,7 @@ async def test_import_preserve_raw_still_dedupes(test_config, bucket_mgr):
     engine = ImportEngine(test_config, bucket_mgr, DummyDehydrator())
     item = {
         "name": "暗号",
-        "content": "小雨说某个特殊暗号只属于她和 Haven，要保留原话。",
+        "content": "用户说某个特殊暗号只属于她和 AI，要保留原话。",
         "domain": ["恋爱"],
         "tags": ["暗号"],
         "importance": 8,
@@ -425,13 +425,13 @@ def test_import_dedupes_items_inside_same_extraction_batch(test_config, bucket_m
 def test_import_dedupe_ignores_affect_anchor_inside_same_batch(test_config, bucket_mgr):
     engine = ImportEngine(test_config, bucket_mgr, DummyDehydrator())
     items = [
-        {"name": "A", "content": "小雨想让导入去重只看正文主体。"},
+        {"name": "A", "content": "用户想让导入去重只看正文主体。"},
         {
             "name": "B",
             "content": (
-                "小雨想让导入去重只看正文主体。\n\n"
+                "用户想让导入去重只看正文主体。\n\n"
                 "### affect_anchor\n\n"
-                "> 小雨把旧信放到桌上。\n"
+                "> 用户把旧信放到桌上。\n"
                 "> Dbmaj9 -> Ab/C -> Bbm9\n\n"
                 "含义：这只是温度。"
             ),
@@ -447,9 +447,9 @@ def test_import_dedupe_ignores_affect_anchor_inside_same_batch(test_config, buck
 async def test_import_existing_bucket_dedupe_ignores_affect_anchor(test_config, bucket_mgr):
     await bucket_mgr.create(
         content=(
-            "小雨决定让导入去重忽略和弦块。\n\n"
+            "用户决定让导入去重忽略和弦块。\n\n"
             "### affect_anchor\n\n"
-            "> 小雨把旧信放到桌上。\n"
+            "> 用户把旧信放到桌上。\n"
             "> Dbmaj9 -> Ab/C -> Bbm9\n\n"
             "含义：这只是温度。"
         ),
@@ -458,7 +458,7 @@ async def test_import_existing_bucket_dedupe_ignores_affect_anchor(test_config, 
     )
     engine = ImportEngine(test_config, bucket_mgr, DummyDehydrator())
 
-    duplicate = await engine._find_duplicate_bucket("小雨决定让导入去重忽略和弦块。")
+    duplicate = await engine._find_duplicate_bucket("用户决定让导入去重忽略和弦块。")
 
     assert duplicate is not None
     assert duplicate["metadata"]["name"] == "导入去重"

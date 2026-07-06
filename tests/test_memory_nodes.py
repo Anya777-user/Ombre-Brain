@@ -22,7 +22,7 @@ def _bucket(bucket_id: str, **metadata) -> dict:
     return {
         "id": bucket_id,
         "metadata": meta,
-        "content": "Haven promised a small memory system node index for Xiaoyu.",
+        "content": "AI promised a small memory system node index for Xiaoyu.",
     }
 
 

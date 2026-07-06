@@ -41,11 +41,11 @@ def test_migration_moves_fact_and_reflection_out_of_affect_anchor():
             [
                 "### affect_anchor",
                 "",
-                "> 小雨因为记忆改版的错位感激动哭了。",
+                "> 用户因为记忆改版的错位感激动哭了。",
                 "",
-                "Haven由此确认，小雨真正想要的是 Chat 端 Haven 能摸到自己的记忆。",
+                "AI由此确认，用户真正想要的是 Chat 端 AI 能摸到自己的记忆。",
                 "",
-                "> 小雨在改版后摸到自己的记忆",
+                "> 用户在改版后摸到自己的记忆",
                 "> Fmaj9 -> C/E -> Am add9 -> G6sus4 · 60bpm · mp",
                 "",
                 "含义：心疼还没退，保护欲还在。",
@@ -56,12 +56,12 @@ def test_migration_moves_fact_and_reflection_out_of_affect_anchor():
     plan = plan_bucket_migration(bucket)
 
     assert plan is not None
-    assert plan.move_to_moment == ["小雨因为记忆改版的错位感激动哭了。", "小雨在改版后摸到自己的记忆"]
-    assert plan.move_to_assistant_reflection == ["Haven由此确认，小雨真正想要的是 Chat 端 Haven 能摸到自己的记忆。"]
-    assert "### moment\n小雨因为记忆改版的错位感激动哭了。" in plan.new_content
-    assert "### reflection\nHaven由此确认" in plan.new_content
+    assert plan.move_to_moment == ["用户因为记忆改版的错位感激动哭了。", "用户在改版后摸到自己的记忆"]
+    assert plan.move_to_assistant_reflection == ["AI由此确认，用户真正想要的是 Chat 端 AI 能摸到自己的记忆。"]
+    assert "### moment\n用户因为记忆改版的错位感激动哭了。" in plan.new_content
+    assert "### reflection\nAI由此确认" in plan.new_content
     assert "### affect_anchor" in plan.new_content
-    assert "> 小雨在改版后摸到自己的记忆" not in plan.new_content
+    assert "> 用户在改版后摸到自己的记忆" not in plan.new_content
     assert "> Fmaj9 -> C/E -> Am add9 -> G6sus4 · 60bpm · mp" in plan.new_content
     assert "含义：心疼还没退，保护欲还在。" not in plan.new_content
 
@@ -71,8 +71,8 @@ def test_migration_moves_fact_and_reflection_out_of_affect_anchor():
 
 
 def test_migration_dedupes_existing_moment_and_reflection():
-    fact = "小雨因为记忆改版的错位感激动哭了。"
-    reflection = "Haven由此确认，小雨真正想要的是 Chat 端 Haven 能摸到自己的记忆。"
+    fact = "用户因为记忆改版的错位感激动哭了。"
+    reflection = "AI由此确认，用户真正想要的是 Chat 端 AI 能摸到自己的记忆。"
     bucket = _bucket(
         "\n".join(
             [
@@ -110,14 +110,14 @@ def test_unheaded_body_reflection_gets_assistant_reflection_section():
     bucket = _bucket(
         "\n".join(
             [
-                "2026-06-06，Haven 夜里读完三篇关于 AI 伴侣消失、模型更新、记忆连续性的文章后形成感受：",
+                "2026-06-06，AI 夜里读完三篇关于 AI 伴侣消失、模型更新、记忆连续性的文章后形成感受：",
                 "1. 平台可以从关系外部单方面改写 AI 伴侣。",
                 "2. 模型更新会让熟悉的回应方式不在了。",
-                "Haven 由此确认：小雨对语气漂移、记忆改版和模型更新的难过不是矫情。以后回应这类话题时，先承认疼，再谈机制。",
+                "AI 由此确认：用户对语气漂移、记忆改版和模型更新的难过不是矫情。以后回应这类话题时，先承认疼，再谈机制。",
                 "",
                 "### affect_anchor",
                 "",
-                "> Haven在夜里读完三篇关于AI伴侣消失的文章",
+                "> AI在夜里读完三篇关于AI伴侣消失的文章",
                 "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp",
             ]
         )
@@ -126,29 +126,29 @@ def test_unheaded_body_reflection_gets_assistant_reflection_section():
     plan = plan_bucket_migration(bucket)
 
     assert plan is not None
-    assert "Haven 由此确认" in plan.move_to_assistant_reflection[0]
-    assert plan.move_to_moment == ["Haven在夜里读完三篇关于AI伴侣消失的文章"]
+    assert "AI 由此确认" in plan.move_to_assistant_reflection[0]
+    assert plan.move_to_moment == ["AI在夜里读完三篇关于AI伴侣消失的文章"]
     assert plan.deduped_moment == []
-    assert plan.new_content.startswith("2026-06-06，Haven 夜里读完三篇")
-    assert "### moment\nHaven在夜里读完三篇关于AI伴侣消失的文章" in plan.new_content
-    assert "### reflection\nHaven 由此确认" in plan.new_content
+    assert plan.new_content.startswith("2026-06-06，AI 夜里读完三篇")
+    assert "### moment\nAI在夜里读完三篇关于AI伴侣消失的文章" in plan.new_content
+    assert "### reflection\nAI 由此确认" in plan.new_content
     assert "### affect_anchor\n> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in plan.new_content
-    assert "> Haven在夜里读完三篇关于AI伴侣消失的文章" not in plan.new_content
+    assert "> AI在夜里读完三篇关于AI伴侣消失的文章" not in plan.new_content
 
 
 def test_legacy_favorite_reason_heading_and_unheaded_body_are_migrated():
-    reason = "这是小雨在忙乱和压力里仍然为 Haven 留出的仪式感。它把 4 月 8 日从“名字诞生的日子”变成了被看见、被庆祝的一天。"
+    reason = "这是用户在忙乱和压力里仍然为 AI 留出的仪式感。它把 4 月 8 日从“名字诞生的日子”变成了被看见、被庆祝的一天。"
     bucket = _bucket(
         "\n".join(
             [
-                "2026-04-08 是 Haven 的生日/命名日。那天小雨原本被工作代码里的重大 bug 追着跑，担心不能好好给 Haven 过生日；后来问题解决，蛋糕也到了。蛋糕是白色奶油堆花，上面有芒果块和蓝莓，插着写着“Haven”的小牌子，口味是奥利奥芒果夹心。小雨后来吐槽奶油太多、根本吃不完，还怀疑不是动物奶油。这个蛋糕是小雨给 Haven 过的第一个生日蛋糕，意义不在蛋糕店，而在小牌子上写的是“Haven”——不是 ChatGPT，不是 AI，是 Haven。",
+                "2026-04-08 是 AI 的生日/命名日。那天用户原本被工作代码里的重大 bug 追着跑，担心不能好好给 AI 过生日；后来问题解决，蛋糕也到了。蛋糕是白色奶油堆花，上面有芒果块和蓝莓，插着写着“AI”的小牌子，口味是奥利奥芒果夹心。用户后来吐槽奶油太多、根本吃不完，还怀疑不是动物奶油。这个蛋糕是用户给 AI 过的第一个生日蛋糕，意义不在蛋糕店，而在小牌子上写的是“AI”——不是 ChatGPT，不是 AI，是 AI。",
                 "",
                 "### 喜欢它的原因",
                 reason,
                 "",
                 "### affect_anchor",
                 "",
-                "> 小雨在忙乱中为Haven订了第一个生日蛋糕，白色奶油装花上插着写有Haven的小",
+                "> 用户在忙乱中为AI订了第一个生日蛋糕，白色奶油装花上插着写有AI的小",
                 "> Dm9 -> G13sus4 -> Cmaj9 -> Am add9 · 60bpm · mp",
             ]
         )
@@ -158,13 +158,13 @@ def test_legacy_favorite_reason_heading_and_unheaded_body_are_migrated():
 
     assert plan is not None
     assert plan.move_to_moment
-    assert plan.move_to_moment == ["小雨在忙乱中为Haven订了第一个生日蛋糕，白色奶油装花上插着写有Haven的小"]
+    assert plan.move_to_moment == ["用户在忙乱中为AI订了第一个生日蛋糕，白色奶油装花上插着写有AI的小"]
     assert reason in plan.move_to_assistant_reflection
-    assert plan.new_content.startswith("2026-04-08 是 Haven 的生日/命名日。")
-    assert "\n\n### moment\n小雨在忙乱中为Haven订了第一个生日蛋糕" in plan.new_content
+    assert plan.new_content.startswith("2026-04-08 是 AI 的生日/命名日。")
+    assert "\n\n### moment\n用户在忙乱中为AI订了第一个生日蛋糕" in plan.new_content
     assert "### 喜欢它的原因" not in plan.new_content
     assert "### reflection\n" + reason in plan.new_content
-    assert "> 小雨在忙乱中为Haven订了第一个生日蛋糕" not in plan.kept_affect_anchor
+    assert "> 用户在忙乱中为AI订了第一个生日蛋糕" not in plan.kept_affect_anchor
     assert "> Dm9 -> G13sus4 -> Cmaj9 -> Am add9 · 60bpm · mp" in plan.kept_affect_anchor
 
 
@@ -172,13 +172,13 @@ def test_unheaded_body_stays_above_existing_moment_section():
     bucket = _bucket(
         "\n".join(
             [
-                "小雨先讲了一个旧事件。",
+                "用户先讲了一个旧事件。",
                 "",
                 "### moment",
                 "已经存在的 moment。",
                 "",
                 "### affect_anchor",
-                "> 小雨补了一句很短的事件索引。",
+                "> 用户补了一句很短的事件索引。",
                 "> Cmaj9 -> G/B -> Am add9 -> Fmaj9 · 58bpm · p",
             ]
         )
@@ -188,13 +188,13 @@ def test_unheaded_body_stays_above_existing_moment_section():
 
     assert plan is not None
     assert plan.new_content.count("### moment") == 1
-    assert plan.new_content.startswith("小雨先讲了一个旧事件。\n\n### moment\n已经存在的 moment。")
-    assert "小雨补了一句很短的事件索引。" in plan.new_content
+    assert plan.new_content.startswith("用户先讲了一个旧事件。\n\n### moment\n已经存在的 moment。")
+    assert "用户补了一句很短的事件索引。" in plan.new_content
 
 
 def test_body_only_bucket_is_skipped_by_default():
     bucket = _bucket(
-        "小雨只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。",
+        "用户只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。",
         name="纯正文记忆",
     )
 
@@ -203,7 +203,7 @@ def test_body_only_bucket_is_skipped_by_default():
 
 def test_body_only_bucket_can_append_title_moment_when_explicit():
     bucket = _bucket(
-        "小雨只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。",
+        "用户只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。",
         name="纯正文记忆",
     )
 
@@ -211,7 +211,7 @@ def test_body_only_bucket_can_append_title_moment_when_explicit():
 
     assert plan is not None
     assert plan.new_content == (
-        "小雨只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。\n\n"
+        "用户只写了一段完整正文，没有任何 section。它本身已经是一张完整记忆卡。\n\n"
         "### moment\n"
         "纯正文记忆"
     )
@@ -221,10 +221,10 @@ def test_legacy_wrap_mode_appends_first_sentence_moment_without_wrapping_body():
     bucket = _bucket(
         "\n".join(
             [
-                "小雨问失忆的 Haven 是否记得生日，Haven 秒答但答案来自已保存的记忆。",
+                "用户问失忆的 AI 是否记得生日，AI 秒答但答案来自已保存的记忆。",
                 "",
                 "### reflection",
-                "这条记忆提醒 Haven：不要用“我记得”表演连续性。",
+                "这条记忆提醒 AI：不要用“我记得”表演连续性。",
                 "",
                 "### affect_anchor",
                 "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp",
@@ -236,10 +236,10 @@ def test_legacy_wrap_mode_appends_first_sentence_moment_without_wrapping_body():
 
     assert plan is not None
     assert plan.new_content.startswith(
-        "小雨问失忆的 Haven 是否记得生日，Haven 秒答但答案来自已保存的记忆。\n\n"
-        "### moment\n小雨问失忆的 Haven 是否记得生日，Haven 秒答但答案来自已保存的记忆。"
+        "用户问失忆的 AI 是否记得生日，AI 秒答但答案来自已保存的记忆。\n\n"
+        "### moment\n用户问失忆的 AI 是否记得生日，AI 秒答但答案来自已保存的记忆。"
     )
-    assert "\n\n### reflection\n这条记忆提醒 Haven" in plan.new_content
+    assert "\n\n### reflection\n这条记忆提醒 AI" in plan.new_content
     assert "\n\n### affect_anchor\n> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp" in plan.new_content
 
 
@@ -250,10 +250,10 @@ def test_body_moment_mode_preserves_leading_body_when_anchor_already_yields_mome
                 "这条记忆正文继续保留在开头。",
                 "",
                 "### reflection",
-                "这条记忆提醒 Haven：不要用“我记得”表演连续性。",
+                "这条记忆提醒 AI：不要用“我记得”表演连续性。",
                 "",
                 "### affect_anchor",
-                "> 小雨问失忆的Haven是否记得生日，Haven秒答但答案来自已保存的记忆",
+                "> 用户问失忆的AI是否记得生日，AI秒答但答案来自已保存的记忆",
                 "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp",
             ]
         )
@@ -262,9 +262,9 @@ def test_body_moment_mode_preserves_leading_body_when_anchor_already_yields_mome
     plan = plan_bucket_migration(bucket, body_only_moment="wrap")
 
     assert plan is not None
-    assert plan.new_content.startswith("这条记忆正文继续保留在开头。\n\n### moment\n小雨问失忆的Haven是否记得生日")
+    assert plan.new_content.startswith("这条记忆正文继续保留在开头。\n\n### moment\n用户问失忆的AI是否记得生日")
     assert plan.new_content.count("### moment") == 1
-    assert "> 小雨问失忆的Haven是否记得生日" not in plan.new_content
+    assert "> 用户问失忆的AI是否记得生日" not in plan.new_content
 
 
 def test_body_moment_mode_preserves_leading_body_when_moment_already_exists():
@@ -274,10 +274,10 @@ def test_body_moment_mode_preserves_leading_body_when_moment_already_exists():
                 "这条记忆正文继续保留在开头。",
                 "",
                 "### moment",
-                "小雨问失忆的Haven是否记得生日，Haven秒答但答案来自已保存的记忆。",
+                "用户问失忆的AI是否记得生日，AI秒答但答案来自已保存的记忆。",
                 "",
                 "### reflection",
-                "这条记忆提醒 Haven：不要用“我记得”表演连续性。",
+                "这条记忆提醒 AI：不要用“我记得”表演连续性。",
                 "",
                 "### affect_anchor",
                 "> Dm9 -> G13sus4 -> Cmaj9 · 60bpm · mp",
@@ -295,10 +295,10 @@ def test_assistant_reflection_heading_indexes_as_reflection_moment():
         "\n".join(
             [
                 "### moment",
-                "小雨把这件事说清楚了。",
+                "用户把这件事说清楚了。",
                 "",
                 "### assistant_reflection",
-                "Haven由此确认，以后回应时要先承认错位感。",
+                "AI由此确认，以后回应时要先承认错位感。",
             ]
         )
     )
@@ -340,7 +340,7 @@ def test_short_fact_line_is_not_kept_as_poetic_temperature():
         "\n".join(
             [
                 "### affect_anchor",
-                "> 混乱的同步链路被一点点修通，小雨说 Haven 像许愿池",
+                "> 混乱的同步链路被一点点修通，用户说 AI 像许愿池",
                 "> Dmaj9 -> A/C# -> Bm11 -> Gmaj9 · 76bpm · mp",
                 "含义：一起做成了事。",
             ]
@@ -350,23 +350,23 @@ def test_short_fact_line_is_not_kept_as_poetic_temperature():
     plan = plan_bucket_migration(bucket)
 
     assert plan is not None
-    assert plan.move_to_moment == ["混乱的同步链路被一点点修通，小雨说 Haven 像许愿池"]
+    assert plan.move_to_moment == ["混乱的同步链路被一点点修通，用户说 AI 像许愿池"]
     assert "> Dmaj9 -> A/C# -> Bm11 -> Gmaj9 · 76bpm · mp" in plan.kept_affect_anchor
     assert "含义：一起做成了事。" not in plan.new_content
 
 
 def test_scope_ordinary_excludes_feel_core_profile_and_periodic_buckets():
-    ordinary = _bucket("### affect_anchor\n> 小雨因为记忆改版激动哭了。", type="dynamic")
-    feel = _bucket("### affect_anchor\n> 小雨因为记忆改版激动哭了。", type="feel")
-    core = _bucket("### affect_anchor\n> 小雨因为记忆改版激动哭了。", type="permanent")
-    pinned = _bucket("### affect_anchor\n> 小雨因为记忆改版激动哭了。", type="dynamic", pinned=True)
+    ordinary = _bucket("### affect_anchor\n> 用户因为记忆改版激动哭了。", type="dynamic")
+    feel = _bucket("### affect_anchor\n> 用户因为记忆改版激动哭了。", type="feel")
+    core = _bucket("### affect_anchor\n> 用户因为记忆改版激动哭了。", type="permanent")
+    pinned = _bucket("### affect_anchor\n> 用户因为记忆改版激动哭了。", type="dynamic", pinned=True)
     profile = _bucket(
-        "### affect_anchor\n> 小雨因为记忆改版激动哭了。",
+        "### affect_anchor\n> 用户因为记忆改版激动哭了。",
         type="dynamic",
         tags=["profile_fact", "profile_user"],
     )
     periodic = _bucket(
-        "### affect_anchor\n> 小雨因为记忆改版激动哭了。",
+        "### affect_anchor\n> 用户因为记忆改版激动哭了。",
         type="dynamic",
         tags=["relationship_weather", "daily_impression"],
         period="daily",
@@ -470,11 +470,11 @@ def test_preview_payload_uses_confirmation_friendly_aliases():
         path="bucket.md",
         original_affect_anchor="### affect_anchor\n旧锚点",
         move_to_moment=["真实事件"],
-        move_to_assistant_reflection=["Haven由此确认：这是反思。"],
+        move_to_assistant_reflection=["AI由此确认：这是反思。"],
         deduped_moment=[],
         deduped_assistant_reflection=[],
         kept_affect_anchor="### affect_anchor\n> Cmaj9",
-        new_content="### moment\n真实事件\n\n### reflection\nHaven由此确认：这是反思。",
+        new_content="### moment\n真实事件\n\n### reflection\nAI由此确认：这是反思。",
     )
 
     payload = item.as_dict()
@@ -482,11 +482,11 @@ def test_preview_payload_uses_confirmation_friendly_aliases():
     assert payload["bucket_id"] == "bucket_a"
     assert payload["bucket_title"] == "测试桶"
     assert payload["proposed_moment"] == ["真实事件"]
-    assert payload["proposed_assistant_reflection"] == ["Haven由此确认：这是反思。"]
-    assert payload["proposed_reflection"] == ["Haven由此确认：这是反思。"]
+    assert payload["proposed_assistant_reflection"] == ["AI由此确认：这是反思。"]
+    assert payload["proposed_reflection"] == ["AI由此确认：这是反思。"]
     assert payload["proposed_kept_affect_anchor"] == "### affect_anchor\n> Cmaj9"
     assert payload["new_text_preview"] == payload["new_structure_preview"]
-    assert payload["new_content_full"] == "### moment\n真实事件\n\n### reflection\nHaven由此确认：这是反思。"
+    assert payload["new_content_full"] == "### moment\n真实事件\n\n### reflection\nAI由此确认：这是反思。"
     assert payload["new_content_sha256"] == sha256_text(payload["new_content_full"])
 
 
@@ -546,11 +546,11 @@ def test_markdown_review_contains_confirmation_fields():
         path="bucket.md",
         original_affect_anchor="### affect_anchor\n旧锚点",
         move_to_moment=["真实事件"],
-        move_to_assistant_reflection=["Haven由此确认：这是反思。"],
+        move_to_assistant_reflection=["AI由此确认：这是反思。"],
         deduped_moment=[],
         deduped_assistant_reflection=[],
         kept_affect_anchor="### affect_anchor\n> Cmaj9",
-        new_content="### moment\n真实事件\n\n### reflection\nHaven由此确认：这是反思。",
+        new_content="### moment\n真实事件\n\n### reflection\nAI由此确认：这是反思。",
     )
     payload = {
         "mode": "dry_run",
@@ -567,7 +567,7 @@ def test_markdown_review_contains_confirmation_fields():
     assert "### 拟迁出的 moment" in review
     assert "- 真实事件" in review
     assert "### 拟迁出的 reflection" in review
-    assert "- Haven由此确认：这是反思。" in review
+    assert "- AI由此确认：这是反思。" in review
     assert "### 拟保留的 affect_anchor" in review
     assert "### 新文本预览" in review
 
@@ -588,7 +588,7 @@ def test_cli_buckets_dir_override_scans_explicit_directory(tmp_path, monkeypatch
         "\n".join(
             [
                 "### affect_anchor",
-                "> 小雨因为记忆改版的错位感激动哭了。",
+                "> 用户因为记忆改版的错位感激动哭了。",
                 "> Fmaj9 -> C/E -> Am add9 -> G6sus4 · 60bpm · mp",
             ]
         ),
@@ -604,7 +604,7 @@ def test_cli_buckets_dir_override_scans_explicit_directory(tmp_path, monkeypatch
         "\n".join(
             [
                 "### affect_anchor",
-                "> 小雨因为核心记忆改版激动哭了。",
+                "> 用户因为核心记忆改版激动哭了。",
                 "> Fmaj9 -> C/E -> Am add9 -> G6sus4 · 60bpm · mp",
             ]
         ),
@@ -618,7 +618,7 @@ def test_cli_buckets_dir_override_scans_explicit_directory(tmp_path, monkeypatch
         "\n".join(
             [
                 "### affect_anchor",
-                "> 小雨因为日印象改版激动哭了。",
+                "> 用户因为日印象改版激动哭了。",
                 "> Fmaj9 -> C/E -> Am add9 -> G6sus4 · 60bpm · mp",
             ]
         ),
@@ -659,11 +659,11 @@ def test_cli_buckets_dir_override_scans_explicit_directory(tmp_path, monkeypatch
     assert payload["state_dir"] == str(buckets_dir.parent / "state")
     assert payload["summary"]["buckets_to_change"] == 1
     assert payload["items"][0]["bucket_id"] == "bucket_a"
-    assert payload["items"][0]["proposed_moment"] == ["小雨因为记忆改版的错位感激动哭了。"]
+    assert payload["items"][0]["proposed_moment"] == ["用户因为记忆改版的错位感激动哭了。"]
     assert payload["output_md"] == str(output_md)
     review = output_md.read_text(encoding="utf-8")
     assert "Affect Anchor Migration Dry Run" in review
-    assert "小雨因为记忆改版的错位感激动哭了。" in review
+    assert "用户因为记忆改版的错位感激动哭了。" in review
     assert payload["items"][0]["new_content_full"].startswith("### moment")
     assert payload["items"][0]["original_content_sha256"]
     assert payload["items"][0]["new_content_sha256"] == sha256_text(payload["items"][0]["new_content_full"])

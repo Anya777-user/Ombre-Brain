@@ -138,7 +138,7 @@ async def test_dehydrator_digest_normalizes_legacy_domain_output(test_config):
             [
                 {
                     "name": "关系边界",
-                    "content": "池又雨不喜欢记忆正文写成来源说明，Haven以后要直接写可用正文。",
+                    "content": "池又雨不喜欢记忆正文写成来源说明，AI以后要直接写可用正文。",
                     "domain": ["恋爱"],
                     "valence": 0.55,
                     "arousal": 0.3,

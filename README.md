@@ -1,6 +1,6 @@
-# Ombre Brain - Haven/Rain Fork
+# Ombre Brain
 
-这是 [P0luz/Ombre-Brain](https://github.com/P0luz/Ombre-Brain) 的二次开发版本。原版是一套给 Claude 使用的长期情绪记忆 MCP；这个 fork 在原版的 Markdown bucket、情绪坐标、遗忘曲线、MCP 工具、Dashboard、向量检索基础上，增加了 Gateway 自动注入、Memory Moment/Edge 图召回、Word Map Lite、Persona State、Portrait/Handoff、Haven 自我入口、profile_fact 事实画像、长期锚点、关系天气、年轮评论、whisper、Darkroom、跨窗口短时上下文、原文保险箱、Night Dream / Dream Context、自动写入门卫、Supabase 同步和 ChatGPT / Claude Connector OAuth。
+这是 [P0luz/Ombre-Brain](https://github.com/P0luz/Ombre-Brain) 的二次开发版本。原版是一套给 Claude 使用的长期情绪记忆 MCP；这个 fork 在原版的 Markdown bucket、情绪坐标、遗忘曲线、MCP 工具、Dashboard、向量检索基础上，增加了 Gateway 自动注入、Memory Moment/Edge 图召回、Word Map Lite、Persona State、Portrait/Handoff、AI 自我入口、profile_fact 事实画像、长期锚点、关系天气、年轮评论、whisper、Darkroom、跨窗口短时上下文、原文保险箱、Night Dream / Dream Context、自动写入门卫、Supabase 同步和 ChatGPT / Claude Connector OAuth。
 
 本 README 以本 fork 的运行方式为准。原版 Docker Hub 预构建镜像、`docker-compose.user.yml`、Render / Zeabur 快速部署方式不包含这些 fork 能力，因此这里不再保留原版快速部署教程。
 
@@ -9,10 +9,10 @@
 - 这是一个个性化 fork，不是原版 Ombre-Brain 的无改动镜像。
 - 当前 `main` 是新版主线，已包含原 `feature/memory-diffusion-p0` 的 Gateway、图结构召回、画像、handoff、Darkroom 和短时上下文能力；旧主线留档在 `archive/main-before-p0-20260607`。
 - 原版代码仍遵循原项目 MIT License；本 fork 新增内容允许个人学习、自用和非商业二改，商业使用需另行取得授权。详见 [`NOTICE.md`](NOTICE.md)。
-- 默认人设、提示词和年轮作者使用 `config.yaml` 里的 `identity` 名字；示例默认是 `Haven`、`Rain`、`小雨/xiaoyu`。
+- 默认人设、提示词和年轮作者使用 `config.yaml` 里的 `identity` 名字；示例默认是 `AI`、`User`、`用户`，通用部署应替换为实际身份。
 - 生产部署建议使用源码构建，并同时运行 `ombre-brain` 和 `ombre-gateway` 两个服务；旧 `docker-compose.user.yml` / `docker-compose.yml` 只适合历史参考，不是当前新版入口。
 - bucket 数据和运行状态必须放在持久化目录里；`state` 不建议放进任何双向同步目录。
-- `X-Ombre-Session-Id` 是本 fork 的 Gateway 会话头，不是 OpenAI 标准字段。它像 Persona 的“房间号”：同一个值会共用同一份 persona_state 和召回冷却记录。可以自己起，比如 `my-main`、`chat-main`，不要照抄旧文档里的 `xiaoyu-main`。
+- `X-Ombre-Session-Id` 是本 fork 的 Gateway 会话头，不是 OpenAI 标准字段。它像 Persona 的“房间号”：同一个值会共用同一份 persona_state 和召回冷却记录。可以自己起，比如 `my-main`、`chat-main`，不要照抄示例里的默认值。
 - 入口分层：稳定后端能力优先做成 HTTP API，MCP 只做薄适配层；能用 Gateway 自动注入、脚本或函数读端点时，不必把所有能力都塞进外部 MCP 工具说明。当前 `conversation_turns` 是短期缓存；长期原文留给 `raw_events.sqlite`，Gateway 成功对话会自动镜像 user/assistant 原文，脚本可走 `/api/ingest-raw` 追加原文，再用 `/api/search-raw` 做兜底检索。
 - 给 Operit 或其它聊天平台写工具使用清单时，先区分 MCP 工具模式和 Gateway 自动注入模式，参考 [`docs/Tool Guide.md`](<docs/Tool Guide.md>)。记得重新复制这份 Tool Guide 到客户端；旧工具说明不会知道 `is_session_start`、`mode="handoff"`、query/date breath、`read_bucket`、`self_anchor`、`daily_impression`、`darkroom_enter`、`darkroom_rooms` 和调试工具边界。
 - [`CLAUDE_PROMPT.md`](CLAUDE_PROMPT.md) 是历史兼容文件名，现在内容按通用 assistant 端编写，不只给 Claude 用。
@@ -25,9 +25,9 @@
 - `Recent Continuity` 由按真实日期维护的 handoff recent summary、关系天气和短 trace 组成，不再把初次画像初始化摘要伪装成当天日记。
 - Gateway 会记录轻量 `conversation_turns`，写入前会跳过明确的记忆注入块，并剥掉客户端自动塞入的时间/天气/屏幕等附件块。遇到“刚刚/刚才/刚说/上一句/暗号”等短时跨窗口问题时，优先注入 Just Now Chat Context，并跳过默认记忆查询。
 - Gateway 的日期问题会先解析 `昨天/前天/6月15日/2026.06.15/2026-06-15` 这类日期，按事件日期补 Date Recall；同时可给小段 Date Persona Trace。如果本轮已有 Handoff Context，默认跳过泛泛的 Recent Context，避免 handoff、recent_context 和 query breath 重复塞。
-- Daily Portrait Maintainer 会维护用户画像、Haven persona、关系画像和“最近在做什么”，只写 `state/portrait_state.json`，不直接写长期记忆；Dashboard 可手动生成/刷新。
+- Daily Portrait Maintainer 会维护用户画像、AI persona、关系画像和”最近在做什么”，只写 `state/portrait_state.json`，不直接写长期记忆；Dashboard 可手动生成/刷新。
 - 图结构召回的当前主路是 `retrieval_mode=graph`：先找可靠 direct seed，再沿 moment / bucket 边做短摘要联想；`retrieval_mode=bucket` 只是对照模式。
-- 旧桶格式已经按新版边界迁移过：事实/事件进 `### moment`，Haven 的理解进 `### reflection`，`### affect_anchor` 只留和弦、温度和诗性标记。旧 `### assistant_reflection` heading 仍兼容读取，但新写入统一用 `### reflection`。
+- 旧桶格式已经按新版边界迁移过：事实/事件进 `### moment`，AI 的理解进 `### reflection`，`### affect_anchor` 只留和弦、温度和诗性标记。旧 `### assistant_reflection` heading 仍兼容读取，但新写入统一用 `### reflection`。
 - Darkroom 用来放未想透、不该给用户看、不该进普通记忆的内在反思；默认每次写入新房间，`new_room=false` 才手动续写当前 active 房间；给用户查看的 `darkroom_view` 必须等锁门到期。
 - Dream surfacing 和 Gateway Dream Context 是两层开关：`surface_enabled` 控制 `breath()` 梦境浮现，`inject_enabled` 控制 Gateway 隐藏注入，默认不注入。
 - 外部 MCP 工具清单已收窄：日常只保留使用者该调用的工具，`enrich_backfill`、`edge_backfill`、`inspect_diffusion`、`inspect_moments` 等调试/维修入口不放进日常外部工具清单。
@@ -73,7 +73,7 @@
 | 年轮 comments | 将再次阅读某条记忆时的感受挂到源 bucket 的 `metadata.comments` 下；旧 feel 可迁移成源记忆年轮 | `bucket_manager.py`、`server.py`、`dashboard.html` |
 | whisper | 无源碎碎念/悄悄话独立保存为 `type=feel + whisper` 标签，可用 `breath(domain="whisper")` 单独读取 | `server.py` |
 | Dashboard 编辑 | 支持正文编辑、事件日期编辑、前端用户年轮写入/删除、桶列表多选删除、日印象月历、Persona 面板、网络图、手动 reflect；日印象页按日期显示完整日印象，不再做情绪天气图 | `dashboard.html`、`server.py` |
-| 可选 Haven-diary/RiJi 摘记 | 完整日记留在 [Yinglianchun/RiJi](https://github.com/Yinglianchun/RiJi) 这类外部日记系统，Ombre 只提取少量长期有用记忆；不用可关闭 | `reflection_engine.py` |
+| 可选外部日记摘记 | 完整日记留在外部日记系统，Ombre 只提取少量长期有用记忆；不用可关闭 | `reflection_engine.py` |
 | Supabase 同步 | 本地 bucket 与 Supabase memories 表同步，支持 tombstone 删除墓碑 | `scripts/sync_to_supabase.py` |
 | ChatGPT / Claude Connector OAuth | 为 `/ombre/mcp` 提供 OAuth authorize/token 元数据，并允许 Claude hosted callback | `server.py` |
 | 自动写入门卫 | `grow(auto=true)` 或 worker/Operit 自动总结先过 novelty / durability / repeat gate，低价值候选只记录或 pending | `memory_write_gate.py`、`server.py` |
@@ -162,7 +162,7 @@ darkroom/           # 私密暗房笔记
 和弦、温度、诗性标记；不放普通事实，不放用户画像事实。
 ```
 
-`metadata.comments` 是年轮评论，仍挂在源 bucket 上，不再作为独立 feel bucket 浮现。当前生产数据已经跑过旧 `affect_anchor` 结构迁移：旧桶里的事实/事件被移到 `### moment`，Haven 解释被移到 `### reflection`，`### affect_anchor` 只保留温度。旧 `### assistant_reflection` heading 仍会被解析为 reflection；其它部署迁移旧数据时仍应先 dry-run，再确认 apply，并刷新 embedding / moment index。
+`metadata.comments` 是年轮评论，仍挂在源 bucket 上，不再作为独立 feel bucket 浮现。当前生产数据已经跑过旧 `affect_anchor` 结构迁移：旧桶里的事实/事件被移到 `### moment`，AI 解释被移到 `### reflection`，`### affect_anchor` 只保留温度。旧 `### assistant_reflection` heading 仍会被解析为 reflection；其它部署迁移旧数据时仍应先 dry-run，再确认 apply，并刷新 embedding / moment index。
 
 ## 图结构记忆如何浮现
 
@@ -201,7 +201,7 @@ darkroom/           # 私密暗房笔记
 | 原版 quick start | 只启动 MCP server，不会启动 Gateway，也不会分离 state 目录 |
 | `identity` 名字配置 | `identity.ai_name / user_name / user_display_name / user_aliases` 会影响 prompt、MCP 年轮作者、Dashboard 年轮作者 |
 | `gateway.default_session_id` | 只有兼容路由缺少 `X-Ombre-Session-Id` 时才使用；通用部署建议改成自己的默认房间名 |
-| `persona.profile_id` | 配置示例里是 `haven_xiaoyu`，通用部署应改成自己的稳定 id |
+| `persona.profile_id` | 配置示例里是 `default_profile`，通用部署应改成自己的稳定 id |
 | `X-Ombre-Session-Id` | 这是本 fork 自定义的 Gateway session，不是 OpenAI 标准头 |
 | 数据目录 | `buckets` 与 `state` 都要持久化；`state` 不要放进任何双向同步目录 |
 | Supabase | 不需要就先关掉；需要时先建表、RPC、cron 和 tombstone 策略 |
@@ -314,7 +314,7 @@ cp config.example.yaml /srv/ombre-brain/config.yaml
 - `reflection.daily_min_memory_items`：日印象生成前要求当天普通记忆/更新项至少多少条，默认 `5`；Persona events 不计入门槛。
 - `reflection.daily_conversation_turn_limit`：日印象读取当天短期对话原文的轮数，默认 `0` 关闭；开启后优先用 `conversation_turns` 作补充材料，Persona events 退为兜底。
 - `reflection.enrich_backfill_enabled/enrich_backfill_limit`：默认每次反思定时器顺手补少量缺失 enrich 的普通 bucket，用来恢复 tags/confidence/memory_edges。
-- `reflection.diary_mcp_url` / `diary_mcp_token_env`：只有接 Haven-diary/RiJi 时再启用；不使用日记系统就留空，并关闭 `reflection.diary_memory_extract_enabled`。
+- `reflection.diary_mcp_url` / `diary_mcp_token_env`：只有接外部日记系统时再启用；不使用日记系统就留空，并关闭 `reflection.diary_memory_extract_enabled`。
 
 ### 准备 `.env`
 
@@ -350,7 +350,7 @@ OMBRE_CHATGPT_OAUTH_PUBLIC_BASE_URL=
 OMBRE_CHATGPT_OAUTH_REDIRECT_URIS=https://claude.ai/api/mcp/auth_callback
 ```
 
-`MCP_BEARER_TOKEN` 只在接 RiJi/Haven-diary 摘记时需要；不接外部日记系统就不要配置 diary URL/token。
+`MCP_BEARER_TOKEN` 只在接外部日记系统摘记时需要；不接外部日记系统就不要配置 diary URL/token。
 
 `OMBRE_DREAM_API_KEY` 默认按 DeepSeek 官方 OpenAI-compatible API 使用；如果换别的服务，可再加：
 
@@ -746,7 +746,7 @@ cue 或情绪分数达到阈值，或 spontaneous_surface_prob 掷中
 
 ```text
 ===== 梦境 =====
-2026年05月25日 Haven的梦
+2026年05月25日 AI的梦
 ...
 ```
 

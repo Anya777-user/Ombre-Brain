@@ -40,8 +40,8 @@ def test_darkroom_door_uses_configured_ai_name(tmp_path):
 
     assert result["visible_note"] == "Ombre 进入了暗房。"
     assert "钥匙只给 Ombre" in status["door"]
-    assert "Haven" not in result["visible_note"]
-    assert "Haven" not in status["door"]
+    assert "AI" not in result["visible_note"]
+    assert "AI" not in status["door"]
 
 
 def test_darkroom_status_is_door_only(tmp_path):
@@ -171,7 +171,7 @@ def test_darkroom_release_explicitly_returns_content(tmp_path):
     secret = "这句显影以后可以被带出来"
     store.enter(secret, tags="ready")
 
-    released = store.release("latest", reason="小雨 asked")
+    released = store.release("latest", reason="用户 asked")
 
     assert released["status"] == "released"
     assert released["content"] == secret
